@@ -140,7 +140,6 @@ You are building a **single-page (SPA-feel) Food Menu manager** for an event com
   - `dialog`, `textarea`, `popover`, `combobox`, `badge`, `scroll-area` (as needed)
 - **Note on Base UI vs Radix**: shadCN uses both libraries:
   - **Radix UI** (`@radix-ui/*`) - Used by most components (dialog, popover, dropdown-menu, etc.)
-  - **Base UI** (`@base-ui/react`) - Used specifically by the `combobox` component
   - Both are unstyled primitive libraries; shadCN provides the styling layer on top
 
 ### 3.7 Auth (Google via Convex)
@@ -177,43 +176,43 @@ Prepare the codebase to support dialogs, forms, comboboxes, toasts, and Convex c
 ## Tickets
 
 ### S1-T1: Add missing shadcn UI primitives to root app
-- [ ] **Scope**
-  - [ ] Add `components/ui/dialog.tsx` (Radix Dialog wrapper)
-  - [ ] Add `components/ui/textarea.tsx`
-  - [ ] Add `components/ui/popover.tsx` (Radix-based)
-  - [ ] Add `components/ui/combobox.tsx` (Base UI-based standalone component)
-  - [ ] Add `components/ui/sonner.tsx` (if using Sonner toasts)
-- [ ] **Acceptance**
-  - [ ] `sticky_footer_dialog.tsx` can import dialog primitives from root and render.
-- [ ] **Notes**
-  - [ ] Keep styling consistent with existing `button/input/dropdown-menu` patterns.
-  - [ ] The `combobox` component uses Base UI (`@base-ui/react`), not Radix, but follows the same styling patterns.
+- [x] **Scope**
+  - [x] Add `components/ui/dialog.tsx` (Radix Dialog wrapper)
+  - [x] Add `components/ui/textarea.tsx`
+  - [x] Add `components/ui/popover.tsx` (Radix-based)
+  - [x] Add `components/ui/combobox.tsx` 
+  - [x] Add `components/ui/sonner.tsx` (if using Sonner toasts)
+- [x] **Acceptance**
+  - [x] `sticky_footer_dialog.tsx` can import dialog primitives from root and render.
+- [x] **Notes**
+  - [x] Keep styling consistent with existing `button/input/dropdown-menu` patterns.
+  - [x] The `combobox` component uses Base UI (`@base-ui/react`), not Radix, but follows the same styling patterns.
 
 ### S1-T2: Add required dependencies for forms + toasts + combobox
-- [ ] **Scope**
-  - [ ] Add packages used by the "Add Menu" dialog:
-    - [ ] `react-hook-form`, `zod`, `@hookform/resolvers`
-    - [ ] `sonner` (toast)
-    - [ ] Radix packages required by primitives added (e.g., `@radix-ui/react-popover` for popover)
-    - [ ] `@base-ui/react` (required for the combobox component)
-- [ ] **Acceptance**
-  - [ ] Typecheck passes; no duplicate conflicting UI implementations.
+- [x] **Scope**
+  - [x] Add packages used by the "Add Menu" dialog:
+    - [x] `react-hook-form`, `zod`, `@hookform/resolvers`
+    - [x] `sonner` (toast)
+    - [x] Radix packages required by primitives added (e.g., `@radix-ui/react-popover` for popover)
+    - [x] `@base-ui/react` (required for the combobox component)
+- [x] **Acceptance**
+  - [x] Typecheck passes; no duplicate conflicting UI implementations.
 
 ### S1-T3: Add a shared clipboard helper + toast integration
-- [ ] **Scope**
-  - [ ] Create `lib/clipboard.ts` with `copyTextToClipboard(text)` returning success/failure.
-  - [ ] Call toasts in the caller (not inside helper) to keep helper pure.
-- [ ] **Acceptance**
-  - [ ] A sample button in an isolated component can copy and show a toast.
+- [x] **Scope**
+  - [x] Create `lib/clipboard.ts` with `copyTextToClipboard(text)` returning success/failure.
+  - [x] Call toasts in the caller (not inside helper) to keep helper pure.
+- [x] **Acceptance**
+  - [x] A sample button in an isolated component can copy and show a toast.
 - [ ] **Tests**
   - [ ] None (browser APIs).
 
 ### S1-T4: Add EUR price conversion helpers
-- [ ] **Scope**
-  - [ ] Create `lib/money.ts` with `eurosStringToCents` and `centsToEurosString`.
-  - [ ] Handle edge cases: empty string, commas vs dots, leading/trailing spaces.
-- [ ] **Acceptance**
-  - [ ] Helper functions used in a small dev-only harness or via console sanity checks.
+- [x] **Scope**
+  - [x] Create `lib/money.ts` with `eurosStringToCents` and `centsToEurosString`.
+  - [x] Handle edge cases: empty string, commas vs dots, leading/trailing spaces.
+- [x] **Acceptance**
+  - [x] Helper functions used in a small dev-only harness or via console sanity checks.
 - [ ] **Tests**
   - [ ] Optional later once a test runner exists.
 
