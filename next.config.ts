@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "notable-ptarmigan-977.convex.cloud",
+        hostname: "**.convex.cloud",
       },
     ],
   },

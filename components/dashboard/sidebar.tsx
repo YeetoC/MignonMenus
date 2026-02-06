@@ -3,6 +3,9 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { toast } from "sonner";
 import {
   Sidebar,
   SidebarContent,
@@ -70,6 +73,8 @@ export function BookmarksSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { signOut } = useAuthActions();
   const [collectionsOpen, setCollectionsOpen] = React.useState(true);
   const [tagsOpen, setTagsOpen] = React.useState(true);
   const {
@@ -132,7 +137,21 @@ export function BookmarksSidebar({
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem
+                className="text-destructive"
+                onSelect={(event) => {
+                  event.preventDefault();
+                  signOut()
+                    .then(() => {
+                      router.push("/signin");
+                      router.refresh();
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      toast.error("Could not sign out");
+                    });
+                }}
+              >
                 <LogOut className="size-4 mr-2" />
                 Log out
               </DropdownMenuItem>
