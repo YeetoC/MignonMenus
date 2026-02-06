@@ -95,7 +95,7 @@ You are building a **single-page (SPA-feel) Food Menu manager** for an event com
   - currently opened menu dialog id
   - “add menu” dialog open state
 - Use **Convex `useQuery`** to fetch:
-  - `menus:listAll` (all shared menus, plus `isFavorite` resolved for the current user)
+  - `menus:listAll` (all shared menus; `isFavorite` is treated as `false` until auth + favorites are implemented)
   - `tags:listAll`
   - `locations:listAll`
 - Compute filtered menus **locally** using memoized selectors (`useMemo` or store selector) to keep clicks instant.
@@ -147,7 +147,7 @@ You are building a **single-page (SPA-feel) Food Menu manager** for an event com
 - App shell behavior:
   - Unauthenticated: show login screen.
   - Authenticated: show the dashboard.
-- Protect Convex functions by checking identity in queries/mutations.
+- Protect Convex functions by checking identity in queries/mutations (Sprint 2 can be public/read-only for dev; lock down in Sprint 3).
 
 ### 3.8 Testing philosophy
 - This repo currently has no test runner configured.
@@ -221,39 +221,41 @@ Prepare the codebase to support dialogs, forms, comboboxes, toasts, and Convex c
 # Sprint 2 — Convex Integration (DB, Storage, Client Provider)
 
 ## Goal
-Introduce Convex and fetch read-only data from it (still okay to keep current UI mock until the end of this sprint).
+Introduce Convex and fetch read-only data from it.
+
+During this sprint, data is allowed to be **readable without login** (dev-friendly). User-specific fields like favorites are **not implemented yet** (treat `isFavorite` as `false` everywhere until auth + favorites are implemented).
 
 ## Tickets
 
 ### S2-T1: Add Convex to the project
-- [ ] **Scope**
-  - [ ] Initialize Convex project folder (`convex/`), schema, and generated types.
-  - [ ] Add Convex client provider to Next.js app (root layout wrapper).
-- [ ] **Acceptance**
-  - [ ] App boots with Convex configured.
+- [x] **Scope**
+  - [x] Initialize Convex project folder (`convex/`), schema, and generated types.
+  - [x] Add Convex client provider to Next.js app (root layout wrapper).
+- [x] **Acceptance**
+  - [x] App boots with Convex configured.
 
 ### S2-T2: Implement Convex schema (menus, tags, locations)
-- [ ] **Scope**
-  - [ ] `menus`, `tags`, `locations` tables.
-  - [ ] Include indexes for common access patterns (by owner, status, etc.).
-- [ ] **Acceptance**
-  - [ ] Schema deploy succeeds.
+- [x] **Scope**
+  - [x] `menus`, `tags`, `locations` tables.
+  - [x] Include indexes for common access patterns (status, deletedAt, updatedAt).
+- [x] **Acceptance**
+  - [x] Schema deploy succeeds.
 
 ### S2-T3: Implement read queries
-- [ ] **Scope**
-  - [ ] `menus:listAll` (for SPA option A)
-  - [ ] `tags:listAll`
-  - [ ] `locations:listAll`
-- [ ] **Acceptance**
-  - [ ] Simple dev page/component can render counts from queries.
+- [x] **Scope**
+  - [x] `menus:listAll` (for SPA option A; returns menu base fields only)
+  - [x] `tags:listAll`
+  - [x] `locations:listAll`
+- [x] **Acceptance**
+  - [x] Simple dev page/component can render counts from queries.
 
 ### S2-T4: Implement storage upload primitives for menu images
-- [ ] **Scope**
-  - [ ] Server-side: function(s) to generate upload URLs and store the resulting file id on a menu.
-  - [ ] Client-side: minimal upload helper that can upload and receive a storage id.
-  - [ ] Support image removal by clearing the image id and deleting the old storage object.
-- [ ] **Acceptance**
-  - [ ] Can upload one image and persist it.
+- [x] **Scope**
+  - [x] Server-side: function(s) to generate upload URLs and store the resulting file id on a menu.
+  - [x] Client-side: minimal upload helper that can upload and receive a storage id.
+  - [x] Support image removal by clearing the image id (delete old storage object after functions are secured in Sprint 3).
+- [x] **Acceptance**
+  - [x] Can upload one image and persist it.
 
 ---
 
@@ -261,6 +263,10 @@ Introduce Convex and fetch read-only data from it (still okay to keep current UI
 
 ## Goal
 Require login and associate **user-specific data** (favorites, future per-user settings) with a user identity.
+ 
+Favorites are still treated as `false` in the UI until the favorites feature is implemented.
+
+This sprint also locks down the previously-public read queries so that **unauthenticated users can’t read/write menus**.
 
 ## Tickets
 
@@ -283,6 +289,7 @@ Require login and associate **user-specific data** (favorites, future per-user s
 ### S3-T3: Secure Convex functions
 - [ ] **Scope**
   - [ ] Update queries/mutations to verify identity.
+  - [ ] Make previously-public read queries require auth (unauthenticated reads should fail safely).
   - [ ] Ensure no cross-user reads/writes of **user-specific** data (favorites, etc.).
 - [ ] **Acceptance**
   - [ ] Attempts to access data without auth fail safely.
