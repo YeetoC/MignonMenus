@@ -330,73 +330,73 @@ Create the authoritative Postgres schema in Supabase and lock it down with RLS.
 ## Tickets
 
 ### S3-T1: Add Supabase migrations workflow to the repo
-- [ ] **Scope**
-  - [ ] Add a `supabase/` folder with migrations (Supabase CLI layout).
-  - [ ] Document the local workflow to apply migrations.
-- [ ] **Acceptance**
-  - [ ] A new migration can be added and applied predictably.
+- [x] **Scope**
+  - [x] Add a `supabase/` folder with migrations (Supabase CLI layout).
+  - [x] Document the local workflow to apply migrations.
+- [x] **Acceptance**
+  - [x] A new migration can be added and applied predictably.
 
 ### S3-T2: Create core tables (`tags`, `locations`)
-- [ ] **Scope**
-  - [ ] Create `tags` and `locations` with:
-    - [ ] `id uuid` PK
-    - [ ] `name text` unique
-    - [ ] `created_at`, `updated_at`
-  - [ ] Add indexes for `name`.
-- [ ] **Acceptance**
-  - [ ] Tables exist and enforce unique names.
+- [x] **Scope**
+  - [x] Create `tags` and `locations` with:
+    - [x] `id uuid` PK
+    - [x] `name text` unique
+    - [x] `created_at`, `updated_at`
+  - [x] Add indexes for `name`.
+- [x] **Acceptance**
+  - [x] Tables exist and enforce unique names.
 
 ### S3-T3: Create `menus` table
-- [ ] **Scope**
-  - [ ] Create `menus` with the locked fields and timestamps.
-  - [ ] Add DB-level constraints for:
-    - [ ] `status in ('active','archived')`
-    - [ ] `deleted_at` nullable
-  - [ ] Add indexes for:
-    - [ ] `updated_at` (desc-friendly)
-    - [ ] `status`
-    - [ ] `deleted_at`
-- [ ] **Acceptance**
-  - [ ] Table exists with constraints and indexes.
+- [x] **Scope**
+  - [x] Create `menus` with the locked fields and timestamps.
+  - [x] Add DB-level constraints for:
+    - [x] `status in ('active','archived')`
+    - [x] `deleted_at` nullable
+  - [x] Add indexes for:
+    - [x] `updated_at` (desc-friendly)
+    - [x] `status`
+    - [x] `deleted_at`
+- [x] **Acceptance**
+  - [x] Table exists with constraints and indexes.
 
 ### S3-T4: Create join tables (`menu_tags`, `menu_locations`)
-- [ ] **Scope**
-  - [ ] Create `menu_tags(menu_id, tag_id)` with a composite PK.
-  - [ ] Create `menu_locations(menu_id, location_id)` with a composite PK.
-  - [ ] Add cascade rules (delete join rows when menu is deleted).
-- [ ] **Acceptance**
-  - [ ] Joining data is possible without duplicates.
+- [x] **Scope**
+  - [x] Create `menu_tags(menu_id, tag_id)` with a composite PK.
+  - [x] Create `menu_locations(menu_id, location_id)` with a composite PK.
+  - [x] Add cascade rules (delete join rows when menu is deleted).
+- [x] **Acceptance**
+  - [x] Joining data is possible without duplicates.
 
 ### S3-T5: Create favorites table (`menu_favorites`)
-- [ ] **Scope**
-  - [ ] Create `menu_favorites(user_id, menu_id)` composite PK.
-  - [ ] Add FK to `auth.users` and `menus`.
-- [ ] **Acceptance**
-  - [ ] A user can favorite/unfavorite a menu without touching the menu row.
+- [x] **Scope**
+  - [x] Create `menu_favorites(user_id, menu_id)` composite PK.
+  - [x] Add FK to `auth.users` and `menus`.
+- [x] **Acceptance**
+  - [x] A user can favorite/unfavorite a menu without touching the menu row.
 
 ### S3-T6: Add `updated_at` triggers
-- [ ] **Scope**
-  - [ ] Add a reusable trigger function to keep `updated_at` correct.
-  - [ ] Attach it to `menus`, `tags`, `locations`.
-- [ ] **Acceptance**
-  - [ ] Updating a row updates `updated_at` automatically.
+- [x] **Scope**
+  - [x] Add a reusable trigger function to keep `updated_at` correct.
+  - [x] Attach it to `menus`, `tags`, `locations`.
+- [x] **Acceptance**
+  - [x] Updating a row updates `updated_at` automatically.
 
 ### S3-T7: Enable RLS + policies (authenticated users)
-- [ ] **Scope**
-  - [ ] Enable RLS on all app tables.
-  - [ ] Add policies so that:
-    - [ ] only authenticated users can read/write menus/tags/locations
-    - [ ] users can only modify their own favorites
-- [ ] **Acceptance**
-  - [ ] Anonymous requests cannot read or write.
-  - [ ] Authenticated requests work.
+- [x] **Scope**
+  - [x] Enable RLS on all app tables.
+  - [x] Add policies so that:
+    - [x] only authenticated users can read/write menus/tags/locations
+    - [x] users can only modify their own favorites
+- [x] **Acceptance**
+  - [x] Anonymous requests cannot read or write.
+  - [x] Authenticated requests work.
 
 ### S3-T8: Seed initial tags/locations (dev)
-- [ ] **Scope**
-  - [ ] Create a dev-only seed script or SQL seed migration.
-  - [ ] Ensure seeding is idempotent (safe to run twice).
-- [ ] **Acceptance**
-  - [ ] Dev data exists without duplicates.
+- [x] **Scope**
+  - [x] Create a dev-only seed script or SQL seed migration.
+  - [x] Ensure seeding is idempotent (safe to run twice).
+- [x] **Acceptance**
+  - [x] Dev data exists without duplicates.
 
 ---
 
