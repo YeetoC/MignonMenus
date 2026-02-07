@@ -3,7 +3,7 @@ import nextTypescript from "eslint-config-next/typescript"
 
 const config = [
   {
-    ignores: ["ecommerce-add-product/**"],
+    ignores: ["ecommerce-add-product/**", "convex/**", "registerUsers.mjs"],
   },
   ...nextCoreWebVitals,
   ...nextTypescript,

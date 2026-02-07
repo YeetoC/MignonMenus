@@ -4,7 +4,6 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { useAuthActions } from "@convex-dev/auth/react";
 import { toast } from "sonner";
 import {
   Sidebar,
@@ -29,6 +28,7 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
 import {
   Bookmark,
   ChevronDown,
@@ -74,7 +74,6 @@ export function BookmarksSidebar({
 }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const router = useRouter();
-  const { signOut } = useAuthActions();
   const [collectionsOpen, setCollectionsOpen] = React.useState(true);
   const [tagsOpen, setTagsOpen] = React.useState(true);
   const {
@@ -141,14 +140,25 @@ export function BookmarksSidebar({
                 className="text-destructive"
                 onSelect={(event) => {
                   event.preventDefault();
-                  signOut()
-                    .then(() => {
+                  const supabase = getSupabaseBrowserClient();
+
+                  supabase.auth
+                    .signOut()
+                    .then((result: { error: { message?: string } | null }) => {
+                      const { error } = result;
+                      if (error) {
+                        throw error;
+                      }
                       router.push("/signin");
                       router.refresh();
                     })
-                    .catch((error) => {
+                    .catch((error: unknown) => {
                       console.error(error);
-                      toast.error("Could not sign out");
+                      const message =
+                        error instanceof Error
+                          ? error.message
+                          : "Could not sign out";
+                      toast.error(message);
                     });
                 }}
               >

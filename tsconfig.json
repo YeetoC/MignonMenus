@@ -37,6 +37,7 @@
   ],
   "exclude": [
     "node_modules",
-    "ecommerce-add-product"
+    "ecommerce-add-product",
+    "convex"
   ]
 }

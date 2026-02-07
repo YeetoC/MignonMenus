@@ -1,5 +1,3 @@
-import type { Id } from "../convex/_generated/dataModel";
-
 /**
  * Upload a file to Convex storage via a generated upload URL.
  *
@@ -11,7 +9,7 @@ import type { Id } from "../convex/_generated/dataModel";
 export async function uploadFileToConvex(
   file: File,
   generateUploadUrl: () => Promise<string>,
-): Promise<Id<"_storage">> {
+): Promise<string> {
   // Step 1: get a short-lived upload URL
   const postUrl = await generateUploadUrl();
 
@@ -26,6 +24,6 @@ export async function uploadFileToConvex(
     throw new Error(`Upload failed: ${result.status} ${result.statusText}`);
   }
 
-  const { storageId } = (await result.json()) as { storageId: Id<"_storage"> };
+  const { storageId } = (await result.json()) as { storageId: string };
   return storageId;
 }

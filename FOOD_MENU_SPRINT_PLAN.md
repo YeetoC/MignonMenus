@@ -239,72 +239,86 @@ At the end of this sprint, the app can:
 ## Tickets
 
 ### S2-T1: Add Supabase dependencies
-- [ ] **Scope**
-  - [ ] Add `@supabase/supabase-js`.
-  - [ ] Add `@supabase/ssr` for Next.js App Router cookie/session support.
-- [ ] **Acceptance**
-  - [ ] Typecheck passes.
+- [x] **Scope**
+  - [x] Add `@supabase/supabase-js`.
+  - [x] Add `@supabase/ssr` for Next.js App Router cookie/session support.
+- [x] **Acceptance**
+  - [x] Typecheck passes.
 
 ### S2-T2: Add Supabase environment variables + runtime validation
 - [ ] **Scope**
   - [ ] Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` to local env docs/README as needed.
-  - [ ] Add a small runtime check that throws a clear error when env vars are missing.
-- [ ] **Acceptance**
-  - [ ] App fails fast with a helpful message when env vars are not set.
+  - [x] Add a small runtime check that throws a clear error when env vars are missing.
+- [x] **Acceptance**
+  - [x] App fails fast with a helpful message when env vars are not set.
 
 ### S2-T3: Create a browser Supabase client helper
-- [ ] **Scope**
-  - [ ] Create a `lib/supabase/browser.ts` helper that exports a singleton Supabase client for client components.
-- [ ] **Acceptance**
-  - [ ] Client components can import the helper without creating multiple clients.
+- [x] **Scope**
+  - [x] Create a `lib/supabase/browser.ts` helper that exports a singleton Supabase client for client components.
+- [x] **Acceptance**
+  - [x] Client components can import the helper without creating multiple clients.
 
 ### S2-T4: Create a server Supabase client helper (Route Handlers)
-- [ ] **Scope**
-  - [ ] Create `lib/supabase/server.ts` using `@supabase/ssr`.
-  - [ ] Expose helpers for:
-    - [ ] creating an authenticated server client (reads cookies)
-    - [ ] reading the current user/session
-- [ ] **Acceptance**
-  - [ ] A Route Handler can read the authenticated user.
+- [x] **Scope**
+  - [x] Create `lib/supabase/server.ts` using `@supabase/ssr`.
+  - [x] Expose helpers for:
+    - [x] creating an authenticated server client (reads cookies)
+    - [x] reading the current user/session
+- [x] **Acceptance**
+  - [x] A Route Handler can read the authenticated user.
 
 ### S2-T5: Replace `middleware.ts` with Supabase auth route guarding
-- [ ] **Scope**
-  - [ ] Implement route protection for:
-    - [ ] `/`, `/favorites`, `/archive`, `/trash`, `/dev/*`
-  - [ ] Redirect behavior:
-    - [ ] unauthenticated -> `/signin`
-    - [ ] authenticated visiting `/signin` -> `/`
-- [ ] **Acceptance**
-  - [ ] You cannot access protected routes without being logged in.
+- [x] **Scope**
+  - [x] Implement route protection for:
+    - [x] `/`, `/favorites`, `/archive`, `/trash`, `/dev/*`
+  - [x] Redirect behavior:
+    - [x] unauthenticated -> `/signin`
+    - [x] authenticated visiting `/signin` -> `/`
+- [x] **Acceptance**
+  - [x] You cannot access protected routes without being logged in.
 
 ### S2-T6: Update the Sign In page to Supabase Auth
-- [ ] **Scope**
-  - [ ] Replace Convex `useAuthActions().signIn(...)` with `supabase.auth.signInWithPassword({ email, password })`.
-  - [ ] Preserve current UI/UX (loading state, error toast, redirect).
-- [ ] **Acceptance**
-  - [ ] Valid credentials sign in successfully.
-  - [ ] Invalid credentials show a useful error.
+- [x] **Scope**
+  - [x] Replace Convex `useAuthActions().signIn(...)` with `supabase.auth.signInWithPassword({ email, password })`.
+  - [x] Preserve current UI/UX (loading state, error toast, redirect).
+- [x] **Acceptance**
+  - [x] Valid credentials sign in successfully.
+  - [x] Invalid credentials show a useful error.
 
 ### S2-T7: Update Sign Out action to Supabase Auth
-- [ ] **Scope**
-  - [ ] Replace Convex sign-out usage with `supabase.auth.signOut()`.
-- [ ] **Acceptance**
-  - [ ] Signing out returns you to `/signin`.
+- [x] **Scope**
+  - [x] Replace Convex sign-out usage with `supabase.auth.signOut()`.
+- [x] **Acceptance**
+  - [x] Signing out returns you to `/signin`.
 
 ### S2-T8: Remove Convex providers from `app/layout.tsx`
-- [ ] **Scope**
-  - [ ] Remove `ConvexAuthNextjsServerProvider` wrapper.
-  - [ ] Remove `ConvexClientProvider` wrapper.
-- [ ] **Acceptance**
-  - [ ] App renders with Supabase auth and no Convex providers.
+- [x] **Scope**
+  - [x] Remove `ConvexAuthNextjsServerProvider` wrapper.
+  - [x] Remove `ConvexClientProvider` wrapper.
+- [x] **Acceptance**
+  - [x] App renders with Supabase auth and no Convex providers.
 
 ### S2-T9: Remove Convex dependencies and wiring
-- [ ] **Scope**
-  - [ ] Remove `convex/` folder usage from the build (and delete it once no longer imported).
-  - [ ] Remove `convex` and `@convex-dev/auth` deps.
-  - [ ] Remove Convex-only scripts (e.g. `seed:users` based on Convex) or replace them with Supabase equivalents.
-- [ ] **Acceptance**
-  - [ ] `pnpm build` works with zero Convex packages installed.
+- [x] **Scope**
+  - [x] Remove `convex/` folder usage from the build (and delete it once no longer imported).
+  - [x] Remove `convex` and `@convex-dev/auth` deps.
+  - [x] Remove Convex-only scripts (e.g. `seed:users` based on Convex) or replace them with Supabase equivalents.
+- [x] **Acceptance**
+  - [x] `pnpm build` works with zero Convex packages installed.
+
+## Sprint 2 recap (implemented)
+
+- Supabase env validation added (`lib/supabase/env.ts`) and now supports `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (preferred) or `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- Supabase client helpers added:
+  - `lib/supabase/browser.ts`
+  - `lib/supabase/server.ts`
+- Auth + route guarding now uses Supabase SSR middleware (`middleware.ts`) and preserves refreshed cookies (including redirects).
+- Sign-in/out migrated to Supabase Auth:
+  - `app/signin/page.tsx` uses `supabase.auth.signInWithPassword`.
+  - Sidebar sign-out uses `supabase.auth.signOut`.
+- Convex providers removed from `app/layout.tsx` (Convex provider file is now a passthrough).
+- Convex packages removed from dependencies; lint/build confirmed green.
+- User seeding moved to Supabase Admin API in `registerUsers.mjs` (requires `SUPABASE_SERVICE_ROLE_KEY`).
 
 ---
 

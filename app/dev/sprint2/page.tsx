@@ -1,63 +1,80 @@
 "use client";
 
 import * as React from "react";
-import { useQuery } from "convex/react";
-import { anyApi } from "convex/server";
+import { Button } from "@/components/ui/button";
+import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 export default function Sprint2DevPage() {
-  const menus = useQuery(anyApi.menus.listAll);
-  const tags = useQuery(anyApi.tags.listAll);
-  const locations = useQuery(anyApi.locations.listAll);
+  const [loading, setLoading] = React.useState(true);
+  const [userJson, setUserJson] = React.useState<string>("");
 
-  const loading = menus === undefined || tags === undefined || locations === undefined;
+  React.useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+
+    supabase.auth
+      .getUser()
+      .then(
+        (result: {
+          data: { user: unknown };
+          error: { message?: string } | null;
+        }) => {
+          const { data, error } = result;
+          if (error) {
+            throw error;
+          }
+          setUserJson(JSON.stringify(data.user, null, 2));
+        },
+      )
+      .catch((error: unknown) => {
+        console.error(error);
+        setUserJson(
+          JSON.stringify(
+            {
+              error: error instanceof Error ? error.message : String(error),
+            },
+            null,
+            2,
+          ),
+        );
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <div className="p-6 space-y-6">
       <div className="space-y-1">
         <h1 className="text-xl font-semibold">Sprint 2 Harness</h1>
-        <p className="text-sm text-muted-foreground">Convex provider + schema + read queries.</p>
+        <p className="text-sm text-muted-foreground">
+          Supabase Auth client + session cookies.
+        </p>
       </div>
 
       {loading ? (
         <div className="text-sm text-muted-foreground">Loading…</div>
       ) : (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="rounded-md border p-3">
-              <div className="text-xs text-muted-foreground">Menus</div>
-              <div className="text-lg font-semibold">{menus.length}</div>
-            </div>
-            <div className="rounded-md border p-3">
-              <div className="text-xs text-muted-foreground">Tags</div>
-              <div className="text-lg font-semibold">{tags.length}</div>
-            </div>
-            <div className="rounded-md border p-3">
-              <div className="text-xs text-muted-foreground">Locations</div>
-              <div className="text-lg font-semibold">{locations.length}</div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div className="rounded-md border p-3">
-              <div className="text-sm font-medium mb-2">Tags</div>
-              <pre className="text-xs overflow-auto">{JSON.stringify(tags, null, 2)}</pre>
-            </div>
-            <div className="rounded-md border p-3">
-              <div className="text-sm font-medium mb-2">Locations</div>
-              <pre className="text-xs overflow-auto">{JSON.stringify(locations, null, 2)}</pre>
-            </div>
-          </div>
-
           <div className="rounded-md border p-3">
-            <div className="text-sm font-medium mb-2">Menus</div>
-            <pre className="text-xs overflow-auto">{JSON.stringify(menus, null, 2)}</pre>
+            <div className="text-sm font-medium mb-2">Current user</div>
+            <pre className="text-xs overflow-auto">{userJson}</pre>
+          </div>
+
+          <div>
+            <Button
+              variant="outline"
+              onClick={() => {
+                const supabase = getSupabaseBrowserClient();
+                supabase.auth.signOut().then(() => {
+                  window.location.href = "/signin";
+                });
+              }}
+            >
+              Sign out
+            </Button>
           </div>
         </div>
       )}
-
-      <div className="text-xs text-muted-foreground">
-        Note: This page uses convex/server anyApi so it can run before convex codegen creates convex/_generated/api.
-      </div>
     </div>
   );
 }

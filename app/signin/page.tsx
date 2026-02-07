@@ -2,15 +2,14 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useAuthActions } from "@convex-dev/auth/react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 export default function SignInPage() {
   const router = useRouter();
-  const { signIn } = useAuthActions();
 
   const [submitting, setSubmitting] = React.useState(false);
 
@@ -31,16 +30,27 @@ export default function SignInPage() {
             setSubmitting(true);
 
             const formData = new FormData(event.currentTarget);
-            formData.set("flow", "signIn");
 
-            signIn("password", formData)
-              .then(() => {
+            const email = String(formData.get("email") ?? "");
+            const password = String(formData.get("password") ?? "");
+
+            const supabase = getSupabaseBrowserClient();
+
+            supabase.auth
+              .signInWithPassword({ email, password })
+              .then((result: { error: { message?: string } | null }) => {
+                const { error } = result;
+                if (error) {
+                  throw error;
+                }
                 router.push("/");
                 router.refresh();
               })
-              .catch((error) => {
+              .catch((error: unknown) => {
                 console.error(error);
-                toast.error("Could not sign in");
+                const message =
+                  error instanceof Error ? error.message : "Could not sign in";
+                toast.error(message);
                 setSubmitting(false);
               });
           }}
