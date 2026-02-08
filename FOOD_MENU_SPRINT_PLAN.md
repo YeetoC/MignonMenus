@@ -662,81 +662,99 @@ Create menus (with tags/locations/price/image) and see them appear immediately i
 ## Tickets
 
 ### S9-T1: Add “Add Menu” button wiring
-- [ ] **Scope**
-  - [ ] Replace label in header.
-  - [ ] Add click handler to open dialog.
-- [ ] **Acceptance**
-  - [ ] Button opens a dialog.
+- [x] **Scope**
+  - [x] Replace label in header.
+  - [x] Add click handler to open dialog.
+- [x] **Acceptance**
+  - [x] Button opens a dialog.
 
 ### S9-T2: Build Add Menu dialog shell
-- [ ] **Scope**
-  - [ ] Create the shadcn `Dialog` shell + sticky layout.
-- [ ] **Acceptance**
-  - [ ] Dialog opens and closes cleanly.
+- [x] **Scope**
+  - [x] Create the shadcn `Dialog` shell + sticky layout.
+- [x] **Acceptance**
+  - [x] Dialog opens and closes cleanly.
 
 ### S9-T3: Add form schema + basic fields (title, description, menuContent, status)
-- [ ] **Scope**
-  - [ ] Add `react-hook-form` + `zod` schema for required fields.
-  - [ ] Implement inputs and validation messaging.
-- [ ] **Acceptance**
-  - [ ] Form blocks submit when required fields are missing.
+- [x] **Scope**
+  - [x] Add `react-hook-form` + `zod` schema for required fields.
+  - [x] Implement inputs and validation messaging.
+  - [x] Clarify and enforce status enum (`active`, `archived`, `trashed`), defaulting to `active` and hiding archive/trash UI unless explicitly needed.
+- [x] **Acceptance**
+  - [x] Form blocks submit when required fields are missing.
+  - [x] Status defaults to `active` and aligns with DB column constraints.
 
 ### S9-T4: Implement `POST /api/tags` (create tag)
-- [ ] **Scope**
-  - [ ] Add a Route Handler that creates a tag by name (idempotent: return existing when name already exists).
-- [ ] **Acceptance**
-  - [ ] Creating the same tag twice does not create duplicates.
+- [x] **Scope**
+  - [x] Add a Route Handler that creates a tag by name (idempotent: return existing when name already exists).
+  - [x] Enforce auth (Supabase session) + trim/lowercase names before matching.
+  - [x] Rely on DB unique constraint/upsert to guarantee idempotency and handle race conditions.
+- [x] **Acceptance**
+  - [x] Creating the same tag twice does not create duplicates.
+  - [x] Unauthenticated requests are rejected.
 
 ### S9-T5: Implement `POST /api/locations` (create location)
-- [ ] **Scope**
-  - [ ] Add a Route Handler that creates a location by name (idempotent).
-- [ ] **Acceptance**
-  - [ ] Creating the same location twice does not create duplicates.
+- [x] **Scope**
+  - [x] Add a Route Handler that creates a location by name (idempotent).
+  - [x] Same auth + normalization rules as tags, with unique constraint enforcement.
+- [x] **Acceptance**
+  - [x] Creating the same location twice does not create duplicates.
+  - [x] Unauthenticated requests are rejected.
 
 ### S9-T6: Implement Tags picker (combobox + plus + create-new)
-- [ ] **Scope**
-  - [ ] Combobox search.
-  - [ ] Plus to add another tag row.
-  - [ ] “Add new” calls `POST /api/tags` immediately and selects the created tag.
-  - [ ] Prevent duplicate selections.
-- [ ] **Acceptance**
-  - [ ] You can attach multiple tags.
+- [x] **Scope**
+  - [x] Combobox search.
+  - [x] Plus to add another tag row.
+  - [x] “Add new” calls `POST /api/tags` immediately and selects the created tag.
+  - [x] Prevent duplicate selections.
+  - [x] Newly created tags appear instantly in the list (optimistic add or lightweight refresh).
+- [x] **Acceptance**
+  - [x] You can attach multiple tags.
+  - [x] Creating a tag surfaces it in the picker without closing the dialog.
 
 ### S9-T7: Implement Locations picker (combobox + plus + create-new)
-- [ ] **Scope**
-  - [ ] Same behavior as tags but calls `POST /api/locations`.
-- [ ] **Acceptance**
-  - [ ] You can attach multiple locations.
+- [x] **Scope**
+  - [x] Same behavior as tags but calls `POST /api/locations`.
+  - [x] Newly created locations appear instantly in the list (optimistic add or lightweight refresh).
+- [x] **Acceptance**
+  - [x] You can attach multiple locations.
+  - [x] Creating a location surfaces it in the picker without closing the dialog.
 
 ### S9-T8: Implement optional price input (EUR UI, cents storage)
-- [ ] **Scope**
-  - [ ] Input accepts `12` or `12.50`.
-  - [ ] Store as cents.
-- [ ] **Acceptance**
-  - [ ] Displayed price matches stored cents.
+- [x] **Scope**
+  - [x] Input accepts `12` or `12.50`.
+  - [x] Store as cents.
+  - [x] Reuse existing money helper (`lib/money.ts`) for parsing/formatting and block negative numbers.
+- [x] **Acceptance**
+  - [x] Displayed price matches stored cents.
 
 ### S9-T9: Implement optional image upload UI
-- [ ] **Scope**
-  - [ ] Upload image to Supabase Storage.
-  - [ ] Support image removal.
-- [ ] **Acceptance**
-  - [ ] You can add/remove an image before saving.
+- [x] **Scope**
+  - [x] Upload image to Supabase Storage.
+  - [x] Support image removal.
+  - [x] Reuse Supabase upload helper + enforce client-side size/MIME validation to mirror backend rules.
+- [x] **Acceptance**
+  - [x] You can add/remove an image before saving.
+  - [x] Invalid files are rejected with clear feedback.
 
 ### S9-T10: Implement `POST /api/menus` (create menu)
-- [ ] **Scope**
-  - [ ] Insert into `menus`.
-  - [ ] Insert join rows for tags/locations.
-  - [ ] Persist `image_path` when present.
-- [ ] **Acceptance**
-  - [ ] New menu exists in DB with correct relations.
+- [x] **Scope**
+  - [x] Insert into `menus`.
+  - [x] Insert join rows for tags/locations.
+  - [x] Persist `image_path` when present.
+  - [x] Validate payload (status enum, tag/location IDs, price cents) and return detailed errors for the form.
+- [x] **Acceptance**
+  - [x] New menu exists in DB with correct relations.
+  - [x] Endpoint rejects unauthenticated or invalid requests with descriptive errors.
 
 ### S9-T11: Update UI to refresh bootstrap payload after creating a menu
-- [ ] **Scope**
-  - [ ] After a successful create:
-    - [ ] close the dialog
-    - [ ] refresh bootstrap data (or apply a local optimistic insert)
-- [ ] **Acceptance**
-  - [ ] Newly created menu appears immediately in the list.
+- [x] **Scope**
+  - [x] After a successful create:
+    - [x] close the dialog
+    - [x] refresh bootstrap data (or apply a local optimistic insert)
+  - [x] Show loading state on submit, disable submit button, and surface API errors without closing the dialog.
+- [x] **Acceptance**
+  - [x] Newly created menu appears immediately in the list.
+  - [x] Users receive feedback for success/failure and can retry without losing input.
 
 ---
 

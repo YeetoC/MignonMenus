@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 import { useMenusUiStore } from "@/store/menus-ui-store";
+import { AddMenuDialog } from "@/components/dashboard/add-menu-dialog";
 
 interface MenusHeaderProps {
   title?: string;
@@ -56,6 +57,8 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
     setSortBy,
     filterType,
     setFilterType,
+    addMenuOpen,
+    setAddMenuOpen,
   } = useMenusUiStore();
 
   const currentSort = sortOptions.find((opt) => opt.value === sortBy);
@@ -71,6 +74,8 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
         </div>
 
         <div className="flex items-center gap-2">
+          <AddMenuDialog open={addMenuOpen} onOpenChange={setAddMenuOpen} />
+
           <div className="relative hidden md:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input
@@ -170,7 +175,11 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button size="sm" className="hidden sm:flex" disabled>
+          <Button
+            size="sm"
+            className="hidden sm:flex"
+            onClick={() => setAddMenuOpen(true)}
+          >
             <Plus className="size-4" />
             Add Menu
           </Button>
