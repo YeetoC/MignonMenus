@@ -1,5 +1,7 @@
 "use client";
 
+import * as React from "react";
+
 import Image from "next/image";
 import { toast } from "sonner";
 
@@ -10,6 +12,8 @@ import { copyTextToClipboard } from "@/lib/clipboard";
 import { centsToEurosString } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { setMenuIsFavorite } from "@/hooks/use-bootstrap-data";
+import { useMenusModel } from "@/hooks/use-menus-model";
 
 export type MenuCardVariant = "grid" | "list";
 
@@ -20,12 +24,61 @@ interface MenuCardProps {
 }
 
 export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
+  const { refresh } = useMenusModel();
+
+  const [favoritePending, setFavoritePending] = React.useState(false);
+
   const handleCopyMenuContent = async () => {
     const ok = await copyTextToClipboard(menu.menuContent);
     if (ok) {
       toast.success("Copied");
     } else {
       toast.error("Copy failed");
+    }
+  };
+
+  const handleToggleFavorite = async () => {
+    if (favoritePending) {
+      return;
+    }
+
+    setFavoritePending(true);
+    const next = !menu.isFavorite;
+    setMenuIsFavorite(menu.id, next);
+
+    try {
+      const res = await fetch(`/api/menus/${menu.id}/favorite`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        let message = `Request failed (${res.status})`;
+        try {
+          const json = (await res.json()) as { error?: string };
+          if (json?.error) {
+            message = json.error;
+          }
+        } catch {
+          // ignore
+        }
+        throw new Error(message);
+      }
+
+      const json = (await res.json()) as { isFavorite?: boolean };
+      if (typeof json.isFavorite === "boolean") {
+        setMenuIsFavorite(menu.id, json.isFavorite);
+      }
+    } catch (error: unknown) {
+      setMenuIsFavorite(menu.id, !next);
+      const message = error instanceof Error ? error.message : "Could not toggle favorite";
+      toast.error(message);
+      refresh();
+    } finally {
+      setFavoritePending(false);
     }
   };
 
@@ -67,8 +120,11 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
             type="button"
             variant="ghost"
             size="icon-xs"
-            disabled
-            className="cursor-not-allowed"
+            disabled={favoritePending}
+            onClick={(e) => {
+              e.stopPropagation();
+              void handleToggleFavorite();
+            }}
           >
             <Heart
               className={cn(
@@ -100,8 +156,12 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
         <Button
           variant="secondary"
           size="icon-xs"
-          disabled
-          className="bg-background/80 backdrop-blur-sm cursor-not-allowed"
+          className="bg-background/80 backdrop-blur-sm"
+          disabled={favoritePending}
+          onClick={(e) => {
+            e.stopPropagation();
+            void handleToggleFavorite();
+          }}
         >
           <Heart
             className={cn(

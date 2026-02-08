@@ -765,43 +765,73 @@ Port existing “Favorites/Archive/Trash” functionality to Supabase-backed men
 
 ## Tickets
 
-### S10-T1: Implement favorite toggle API
-- [ ] **Scope**
-  - [ ] Add `POST /api/menus/:id/favorite` to toggle the current user’s favorite.
-- [ ] **Acceptance**
-  - [ ] Favoriting/unfavoriting is persisted per user.
+### S10-T1: Implement favorite toggle (API + UI)
+- [x] **Scope**
+  - [x] Add `POST /api/menus/[id]/favorite` to toggle the current user’s favorite.
+  - [x] Enable favorite toggle in the UI (menu cards and/or menu dialog) and call the endpoint.
+  - [x] Update the UI immediately after toggling (optimistic update or refresh bootstrap).
+- [x] **Acceptance**
+  - [x] Favoriting/unfavoriting is persisted per user.
+  - [x] Favorite state updates immediately in the UI.
 
-### S10-T2: Add favorites to the bootstrap read model
-- [ ] **Scope**
-  - [ ] Ensure `/api/bootstrap` includes `isFavorite` on menus.
-- [ ] **Acceptance**
-  - [ ] Favorites filter/page works without extra round-trips.
+### S10-T2: Favorites in the bootstrap read model
+- [x] **Scope**
+  - [x] Ensure `/api/bootstrap` includes `isFavorite` on menus.
+- [x] **Acceptance**
+  - [x] Favorites filter/page works without extra round-trips.
 
-### S10-T3: Implement archive/unarchive API
-- [ ] **Scope**
-  - [ ] Add `PATCH /api/menus/:id` support to update `status`.
-- [ ] **Acceptance**
-  - [ ] Archive page shows archived menus.
+### S10-T3: Port Favorites page to menus model
+- [x] **Scope**
+  - [x] Replace bookmark-based Favorites UI/state with Supabase-backed menus.
+  - [x] Show only favorited menus (and exclude trashed menus).
+- [x] **Acceptance**
+  - [x] `/favorites` displays favorited menus.
+  - [x] Unfavoriting removes the menu from `/favorites` immediately.
 
-### S10-T4: Implement trash/restore API
-- [ ] **Scope**
-  - [ ] Add `PATCH /api/menus/:id` support to set/clear `deleted_at`.
-- [ ] **Acceptance**
-  - [ ] Trash page lists trashed menus; restore works.
+### S10-T4: Implement archive/unarchive API
+- [x] **Scope**
+  - [x] Add `PATCH /api/menus/[id]` support to update `status`.
+- [x] **Acceptance**
+  - [x] Archive/unarchive persists and is reflected in the UI.
 
-### S10-T5: Implement permanent delete API (menu + joins + favorites)
-- [ ] **Scope**
-  - [ ] Add `DELETE /api/menus/:id` to permanently delete a menu.
-- [ ] **Acceptance**
-  - [ ] Deleting removes join rows and favorites references.
+### S10-T5: Port Archive page to menus model
+- [x] **Scope**
+  - [x] Replace bookmark-based Archive UI/state with menus where `status = 'archived'` and `deleted_at is null`.
+  - [x] Add actions: unarchive, move to trash.
+- [x] **Acceptance**
+  - [x] `/archive` shows archived menus.
+  - [x] Unarchive and move-to-trash actions work and update the UI.
 
-### S10-T6: Implement 30-day trash cleanup job
-- [ ] **Scope**
-  - [ ] Add a SQL function that deletes menus with `deleted_at < now() - interval '30 days'`.
-  - [ ] Schedule it (Supabase cron / scheduled job mechanism).
-  - [ ] If images exist, ensure associated Storage objects are cleaned up.
-- [ ] **Acceptance**
-  - [ ] Old trashed menus are deleted automatically.
+### S10-T6: Implement trash/restore API
+- [x] **Scope**
+  - [x] Add `PATCH /api/menus/[id]` support to set/clear `deleted_at`.
+- [x] **Acceptance**
+  - [x] Trash/restore persists and is reflected in the UI.
+
+### S10-T7: Port Trash page to menus model
+- [x] **Scope**
+  - [x] Replace bookmark-based Trash UI/state with menus where `deleted_at is not null`.
+  - [x] Add actions: restore, delete permanently.
+- [x] **Acceptance**
+  - [x] `/trash` lists trashed menus.
+  - [x] Restore works.
+  - [x] Delete permanently removes the menu.
+
+### S10-T8: Implement permanent delete API (menu + joins + favorites + image)
+- [x] **Scope**
+  - [x] Add `DELETE /api/menus/[id]` to permanently delete a menu.
+  - [x] If `image_path` exists, delete the associated Storage object in `menu-images` (service role).
+- [x] **Acceptance**
+  - [x] Deleting removes join rows and favorites references.
+  - [x] Associated Storage image is deleted.
+
+### S10-T9: Implement 30-day trash cleanup job (Option A — scheduled Edge Function)
+- [x] **Scope**
+  - [x] Create an Edge Function that deletes menus with `deleted_at < now() - interval '30 days'`.
+  - [x] If `image_path` exists, delete the associated Storage object in `menu-images` before deleting the menu.
+  - [x] Schedule it (Supabase scheduled job mechanism).
+- [x] **Acceptance**
+  - [x] Old trashed menus (and their images) are deleted automatically.
 
 ---
 

@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 import type { Location, Menu, Tag } from "@/lib/read-model";
 import { copyTextToClipboard } from "@/lib/clipboard";
 
@@ -23,6 +25,7 @@ export type MenuDialogStickyFooterProps = {
   menu: Menu;
   tags: Tag[];
   locations: Location[];
+  footerActions?: ReactNode;
 };
 
 export function MenuDialogStickyFooter({
@@ -31,6 +34,7 @@ export function MenuDialogStickyFooter({
   menu,
   tags,
   locations,
+  footerActions,
 }: MenuDialogStickyFooterProps) {
   const handleCopy = async () => {
     const ok = await copyTextToClipboard(menu.menuContent);
@@ -92,6 +96,7 @@ export function MenuDialogStickyFooter({
         </div>
 
         <DialogFooter className="shrink-0 border-t bg-background px-6 py-4">
+          {footerActions}
           <Button type="button" onClick={() => void handleCopy()}>
             Copy
           </Button>

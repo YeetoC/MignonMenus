@@ -38,6 +38,7 @@
   "exclude": [
     "node_modules",
     "ecommerce-add-product",
-    "convex"
+    "convex",
+    "supabase/functions"
   ]
 }

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import type { BootstrapPayload } from "@/lib/read-model";
+import type { BootstrapPayload, Menu, MenuStatus } from "@/lib/read-model";
 
 type BootstrapState = {
   data: BootstrapPayload | null;
@@ -38,6 +38,72 @@ function subscribe(listener: () => void) {
 
 function getSnapshot() {
   return state;
+}
+
+export function patchBootstrapPayload(
+  updater: (prev: BootstrapPayload) => BootstrapPayload,
+) {
+  if (!state.data) {
+    return;
+  }
+
+  const nextData = updater(state.data);
+
+  setState({
+    data: nextData,
+    error: state.error,
+    loading: state.loading,
+  });
+}
+
+export function setMenuIsFavorite(menuId: string, isFavorite: boolean) {
+  patchBootstrapPayload((prev) => ({
+    ...prev,
+    menus: prev.menus.map((menu) =>
+      menu.id === menuId ? { ...menu, isFavorite } : menu,
+    ),
+  }));
+}
+
+export function patchMenu(menuId: string, patch: Partial<Menu>) {
+  patchBootstrapPayload((prev) => ({
+    ...prev,
+    menus: prev.menus.map((menu) =>
+      menu.id === menuId ? { ...menu, ...patch } : menu,
+    ),
+  }));
+}
+
+export function insertMenuIntoBootstrap(menu: Menu, index: number) {
+  patchBootstrapPayload((prev) => {
+    const without = prev.menus.filter((m) => m.id !== menu.id);
+    const clamped = Math.min(Math.max(index, 0), without.length);
+    const nextMenus = [
+      ...without.slice(0, clamped),
+      menu,
+      ...without.slice(clamped),
+    ];
+
+    return {
+      ...prev,
+      menus: nextMenus,
+    };
+  });
+}
+
+export function setMenuStatus(menuId: string, status: MenuStatus) {
+  patchMenu(menuId, { status });
+}
+
+export function setMenuDeletedAt(menuId: string, deletedAt: string | null) {
+  patchMenu(menuId, { deletedAt });
+}
+
+export function removeMenuFromBootstrap(menuId: string) {
+  patchBootstrapPayload((prev) => ({
+    ...prev,
+    menus: prev.menus.filter((menu) => menu.id !== menuId),
+  }));
 }
 
 async function loadBootstrapPayload(force: boolean): Promise<BootstrapPayload> {
