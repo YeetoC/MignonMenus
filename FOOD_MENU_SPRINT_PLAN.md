@@ -460,68 +460,68 @@ Swap the UI from mock bookmarks to real menus, while preserving instant filterin
 ## Tickets
 
 ### S5-T0: Remove sidebar search UI (use header search only)
-- [ ] **Scope**
-  - [ ] Remove the search input from the sidebar.
-  - [ ] Keep a single canonical search input in the header wired to Zustand UI state.
-- [ ] **Acceptance**
-  - [ ] Search UX is consistent (no duplicate search bars).
+- [x] **Scope**
+  - [x] Remove the search input from the sidebar.
+  - [x] Keep a single canonical search input in the header wired to Zustand UI state.
+- [x] **Acceptance**
+  - [x] Search UX is consistent (no duplicate search bars).
 
 ### S5-T1: Rename domain types and UI copy (Bookmarks -> Menus)
-- [ ] **Scope**
-  - [ ] Replace `Bookmark` types with `Menu` types.
-  - [ ] Update visible labels (Bookmarks -> Menus; Collections -> Locations).
-  - [ ] Keep `/favorites`, `/archive`, and `/trash` temporarily bookmark-based and isolated from the new menus data model (until Sprint 10).
-- [ ] **Acceptance**
-  - [ ] UI text matches the new domain.
+- [x] **Scope**
+  - [x] Replace `Bookmark` types with `Menu` types.
+  - [x] Update visible labels (Bookmarks -> Menus; Collections -> Locations).
+  - [x] Keep `/favorites`, `/archive`, and `/trash` temporarily bookmark-based and isolated from the new menus data model (until Sprint 10).
+- [x] **Acceptance**
+  - [x] UI text matches the new domain.
 
 ### S5-T2: Split UI state store from server data
-- [ ] **Scope**
-  - [ ] Keep Zustand for UI state only.
-  - [ ] Move server-loaded data (menus/tags/locations) into a dedicated hook/context built on top of `useBootstrapData()`.
-  - [ ] Create a small read-model adapter (best guess: `useMenusModel`) that provides lookup maps and derived values to keep components simple.
-- [ ] **Acceptance**
-  - [ ] UI state changes do not refetch data.
+- [x] **Scope**
+  - [x] Keep Zustand for UI state only.
+  - [x] Move server-loaded data (menus/tags/locations) into a dedicated hook/context built on top of `useBootstrapData()`.
+  - [x] Create a small read-model adapter (best guess: `useMenusModel`) that provides lookup maps and derived values to keep components simple.
+- [x] **Acceptance**
+  - [x] UI state changes do not refetch data.
 
 ### S5-T3: Implement a canonical `getFilteredMenus` selector
-- [ ] **Scope**
-  - [ ] Implement filtering + sorting for:
-    - [ ] location (All / Unassigned / specific location)
-    - [ ] tag multi-filter
-    - [ ] search (title + description only)
-    - [ ] favorites / with-tags / without-tags
-    - [ ] sorting (best guess: keep existing sort modes but map them to menus)
-      - [ ] date-newest: `updatedAt desc`, then `title`
-      - [ ] date-oldest: `updatedAt asc`, then `title`
-      - [ ] alpha-az: `title asc`, then `updatedAt desc`
-      - [ ] alpha-za: `title desc`, then `updatedAt desc`
-- [ ] **Acceptance**
+- [x] **Scope**
+  - [x] Implement filtering + sorting for:
+    - [x] location (All / Unassigned / specific location)
+    - [x] tag multi-filter
+    - [x] search (title + description only)
+    - [x] favorites / with-tags / without-tags
+    - [x] sorting (best guess: keep existing sort modes but map them to menus)
+      - [x] date-newest: `updatedAt desc`, then `title`
+      - [x] date-oldest: `updatedAt asc`, then `title`
+      - [x] alpha-az: `title asc`, then `updatedAt desc`
+      - [x] alpha-za: `title desc`, then `updatedAt desc`
+- [x] **Acceptance**
   - [ ] Grid/list/tabs use the same selector output.
 
 ### S5-T4: Replace sidebar collections with real locations
-- [ ] **Scope**
-  - [ ] Sidebar renders locations from bootstrap payload.
-  - [ ] Selected location stored in Zustand.
-  - [ ] Clicking a location clears tag selection.
-  - [ ] Compute sidebar counts client-side from menus (no hardcoded counts).
-- [ ] **Acceptance**
-  - [ ] Switching locations is instant after initial load.
+- [x] **Scope**
+  - [x] Sidebar renders locations from bootstrap payload.
+  - [x] Selected location stored in Zustand.
+  - [x] Clicking a location clears tag selection.
+  - [x] Compute sidebar counts client-side from menus (no hardcoded counts).
+- [x] **Acceptance**
+  - [x] Switching locations is instant after initial load.
 
 ### S5-T5: Replace tag chips with real tags
-- [ ] **Scope**
-  - [ ] Tag chips come from bootstrap payload.
-  - [ ] Keep toggle UX.
-- [ ] **Acceptance**
-  - [ ] Tag filtering is instant.
+- [x] **Scope**
+  - [x] Tag chips come from bootstrap payload.
+  - [x] Keep toggle UX.
+- [x] **Acceptance**
+  - [x] Tag filtering is instant.
 
 ### S5-T6: Replace list/grid content with real menus
-- [ ] **Scope**
-  - [ ] Render menu cards from the canonical filtered list.
-  - [ ] Remove mock bookmarks usage from content components.
-  - [ ] Keep menu rendering minimal in Sprint 5 (best guess: a simple menu list/grid item component that only renders title + description).
-  - [ ] Do not refactor `BookmarkCard` in Sprint 5; defer the deeper card refactor (replacing URL/favicon behaviors, copy/price/image UI) to Sprint 7.
-- [ ] **Acceptance**
-  - [ ] The dashboard renders Supabase-backed menus.
-  - [ ] The home dashboard does not import `mock-data/bookmarks`.
+- [x] **Scope**
+  - [x] Render menu cards from the canonical filtered list.
+  - [x] Remove mock bookmarks usage from content components.
+  - [x] Keep menu rendering minimal in Sprint 5 (best guess: a simple menu list/grid item component that only renders title + description).
+  - [x] Do not refactor `BookmarkCard` in Sprint 5; defer the deeper card refactor (replacing URL/favicon behaviors, copy/price/image UI) to Sprint 7.
+- [x] **Acceptance**
+  - [x] The dashboard renders Supabase-backed menus.
+  - [x] The home dashboard does not import `mock-data/bookmarks`.
 
 ---
 
@@ -533,33 +533,46 @@ Support optional menu images via Supabase Storage.
 ## Tickets
 
 ### S6-T1: Create Storage bucket + policies
-- [ ] **Scope**
-  - [ ] Create a `menu-images` bucket.
-  - [ ] Add policies so that only authenticated users can upload/read (choose public vs signed URLs explicitly).
-- [ ] **Acceptance**
-  - [ ] Uploading a file works and access is correctly restricted.
+- [x] **Scope**
+  - [x] Create a `menu-images` bucket.
+  - [x] Bucket access model: **public**.
+  - [x] Restrict upload/delete to authenticated users via server route (`POST/DELETE /api/menu-images`) using the service role key.
+  - [x] Add upload restrictions (max file size + allowed MIME types).
+  - [x] Implement bucket creation/restrictions as a SQL migration (not just manual dashboard config).
+- [x] **Acceptance**
+  - [x] Uploading a file works and access is correctly restricted.
 
-### S6-T2: Add `image_path` (or equivalent) to `menus`
-- [ ] **Scope**
-  - [ ] Add a nullable column on `menus` that references the uploaded file path.
-- [ ] **Acceptance**
-  - [ ] A menu can be created with or without an image.
+### S6-T2: Confirm `menus.image_path` semantics
+- [x] **Scope**
+  - [x] Ensure `menus.image_path` exists and is nullable.
+  - [x] Store a **storage object path** (not a full URL) in `image_path`.
+- [x] **Acceptance**
+  - [x] A menu can be created with or without an image.
 
 ### S6-T3: Add a Supabase upload helper
-- [ ] **Scope**
-  - [ ] Replace `lib/convex-upload.ts` with a Supabase-based helper.
-  - [ ] Support:
-    - [ ] upload
-    - [ ] delete
-    - [ ] deriving display URL (public or signed)
-- [ ] **Acceptance**
-  - [ ] Helper can upload a file and return a stable reference.
+- [x] **Scope**
+  - [x] Replace `lib/convex-upload.ts` with a Supabase-based helper.
+  - [x] Support:
+    - [x] upload
+    - [x] delete
+    - [x] deriving display URL (public)
+  - [x] Path convention: `menus/<menuId>/<uuid>.<ext>`.
+  - [x] Best-effort replace behavior (upload new, persist new path, delete old).
+- [x] **Acceptance**
+  - [x] Helper can upload a file and return a stable `image_path` reference.
 
 ### S6-T4: Update Next.js image remote config for Supabase Storage
-- [ ] **Scope**
-  - [ ] Update `next.config.ts` `images.remotePatterns` to include the Supabase storage host.
-- [ ] **Acceptance**
-  - [ ] Next `<Image />` can render stored images.
+- [x] **Scope**
+  - [x] Update `next.config.ts` `images.remotePatterns` to include the Supabase storage host (`<project-ref>.supabase.co`).
+- [x] **Acceptance**
+  - [x] Next `<Image />` can render stored images.
+
+### S6-T5: Derive `imageUrl` for menus in bootstrap payload
+- [x] **Scope**
+  - [x] In `GET /api/bootstrap`, map `menus.image_path` to a public display URL.
+  - [x] Keep `menus.image_path` as the persisted reference; do not store public URLs in DB.
+- [x] **Acceptance**
+  - [x] Menus with images render with a valid `imageUrl` in the UI.
 
 ---
 

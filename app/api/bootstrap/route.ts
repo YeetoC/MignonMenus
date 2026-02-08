@@ -118,12 +118,28 @@ export async function GET() {
     favoritesResult.data.map((row) => row.menu_id),
   );
 
+  const publicImageUrlByMenuId = new Map<string, string>();
+  menusResult.data.forEach((row) => {
+    if (!row.image_path) {
+      return;
+    }
+
+    const url = supabase.storage
+      .from("menu-images")
+      .getPublicUrl(row.image_path).data.publicUrl;
+
+    if (url) {
+      publicImageUrlByMenuId.set(row.id, url);
+    }
+  });
+
   const payload: BootstrapPayload = {
     menus: menusResult.data.map((row) =>
       mapMenuRow(row, {
         tagIds: tagIdsByMenuId.get(row.id) ?? [],
         locationIds: locationIdsByMenuId.get(row.id) ?? [],
         isFavorite: favoriteMenuIds.has(row.id),
+        imageUrl: publicImageUrlByMenuId.get(row.id) ?? null,
       }),
     ),
     tags: tagsResult.data.map(mapTagRow),

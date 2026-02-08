@@ -20,6 +20,7 @@ export type Menu = {
   description: string | null;
   menuContent: string;
   pricePerPersonCents: number | null;
+  imagePath: string | null;
   imageUrl: string | null;
   status: MenuStatus;
   deletedAt: string | null;
