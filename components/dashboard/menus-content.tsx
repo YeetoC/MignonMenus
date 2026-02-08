@@ -8,31 +8,33 @@ import { X } from "lucide-react";
 import { useFilteredMenus } from "@/hooks/use-filtered-menus";
 import { useMenusUiStore } from "@/store/menus-ui-store";
 import { MenusStatsCards } from "@/components/dashboard/menus-stats-cards";
-
-function MenuListItem({
-  title,
-  description,
-}: {
-  title: string;
-  description: string | null;
-}) {
-  return (
-    <div className="flex flex-col gap-1 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
-      <h3 className="font-medium line-clamp-1">{title}</h3>
-      {description ? (
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {description}
-        </p>
-      ) : null}
-    </div>
-  );
-}
+import { MenuCard } from "@/components/dashboard/menu-card";
+import { MenuDialogStickyFooter } from "@/components/dashboard/menu-dialog-sticky-footer";
 
 export function MenusContent() {
   const { model, filteredMenus, loading, error } = useFilteredMenus();
 
-  const { viewMode, selectedTagIds, toggleTagId, filterType, setFilterType, sortBy } =
-    useMenusUiStore();
+  const {
+    viewMode,
+    selectedTagIds,
+    toggleTagId,
+    filterType,
+    setFilterType,
+    sortBy,
+    openedMenuId,
+    setOpenedMenuId,
+  } = useMenusUiStore();
+
+  const openedMenu = React.useMemo(() => {
+    if (!openedMenuId) return null;
+    return model.menus.find((m) => m.id === openedMenuId) ?? null;
+  }, [model.menus, openedMenuId]);
+
+  React.useEffect(() => {
+    if (openedMenuId && !openedMenu) {
+      setOpenedMenuId(null);
+    }
+  }, [openedMenu, openedMenuId, setOpenedMenuId]);
 
   const activeTagsData = React.useMemo(() => {
     if (selectedTagIds.length === 0) return [];
@@ -68,6 +70,20 @@ export function MenusContent() {
     <div className="flex-1 w-full overflow-auto">
       <div className="p-4 md:p-6 space-y-6">
         <MenusStatsCards />
+
+        {openedMenu ? (
+          <MenuDialogStickyFooter
+            open={true}
+            onOpenChange={(open) => {
+              if (!open) {
+                setOpenedMenuId(null);
+              }
+            }}
+            menu={openedMenu}
+            tags={model.tags}
+            locations={model.locations}
+          />
+        ) : null}
 
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -115,20 +131,22 @@ export function MenusContent() {
           {viewMode === "grid" ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredMenus.map((menu) => (
-                <MenuListItem
+                <MenuCard
                   key={menu.id}
-                  title={menu.title}
-                  description={menu.description}
+                  menu={menu}
+                  variant="grid"
+                  onClick={() => setOpenedMenuId(menu.id)}
                 />
               ))}
             </div>
           ) : (
             <div className="flex flex-col gap-2">
               {filteredMenus.map((menu) => (
-                <MenuListItem
+                <MenuCard
                   key={menu.id}
-                  title={menu.title}
-                  description={menu.description}
+                  menu={menu}
+                  variant="list"
+                  onClick={() => setOpenedMenuId(menu.id)}
                 />
               ))}
             </div>

@@ -584,40 +584,45 @@ Implement the requested card UI changes and copy behavior.
 ## Tickets
 
 ### S7-T0: Refactor bookmark cards into menu cards (deferred from Sprint 5)
-- [ ] **Scope**
-  - [ ] Replace `BookmarkCard` usage with a `MenuCard` (or equivalent) that renders menu fields.
-  - [ ] Remove bookmark-only behaviors (open URL, copy URL, favicon assumptions).
-  - [ ] Ensure grid and row variants are supported.
-- [ ] **Acceptance**
-  - [ ] The dashboard renders menus using a menu-native card component.
+- [x] **Scope**
+  - [x] Replace `BookmarkCard` usage with a `MenuCard` (or equivalent) that renders menu fields.
+  - [x] Remove bookmark-only behaviors (open URL, copy URL, favicon assumptions).
+  - [x] Ensure grid and row variants are supported.
+  - [x] Card click behavior (temporary, pre-Sprint 8): make the card a single clear click target, but do not implement/open a dialog yet.
+  - [x] Keep a heart icon/button slot in the UI but keep it **dead** for now (no persistence, no local toggling).
+- [x] **Acceptance**
+  - [x] The dashboard renders menus using a menu-native card component.
+  - [x] Grid and row variants both look correct and are usable.
 
 ### S7-T1: Grid card image slot (optional)
-- [ ] **Scope**
-  - [ ] Render menu image when present.
-  - [ ] Render a consistent placeholder when missing.
-- [ ] **Acceptance**
-  - [ ] Grid card renders correctly in light/dark mode.
+- [x] **Scope**
+  - [x] Render menu image when present.
+  - [x] Render a consistent placeholder when missing.
+  - [x] Use the derived `imageUrl` from the bootstrap read model (do not build storage URLs in the card).
+- [x] **Acceptance**
+  - [x] Grid card renders correctly in light/dark mode.
 
 ### S7-T2: Add Copy button to grid card top-right (left of heart)
-- [ ] **Scope**
-  - [ ] Copy `menuContent` only.
-  - [ ] `stopPropagation()` so it doesn’t open the dialog.
-  - [ ] Toast feedback.
-- [ ] **Acceptance**
-  - [ ] Copy works; card still opens dialog when clicking elsewhere.
+- [x] **Scope**
+  - [x] Copy `menuContent` only.
+  - [x] `stopPropagation()` so it doesn’t open the dialog.
+  - [x] Toast feedback (success + failure).
+- [x] **Acceptance**
+  - [x] Copy works; card still opens dialog when clicking elsewhere.
 
 ### S7-T3: Show optional `€X / person` in grid card bottom-right
-- [ ] **Scope**
-  - [ ] Display only when `pricePerPersonCents` exists.
-- [ ] **Acceptance**
-  - [ ] Correct formatting and positioning.
+- [x] **Scope**
+  - [x] Display only when `pricePerPersonCents` exists.
+  - [x] Format: `€12.00 / person` (always show 2 decimals).
+- [x] **Acceptance**
+  - [x] Correct formatting and positioning.
 
 ### S7-T4: Row view copy + price placement
-- [ ] **Scope**
-  - [ ] Add copy button to row view.
-  - [ ] Display price in row view.
-- [ ] **Acceptance**
-  - [ ] Row view remains compact and readable.
+- [x] **Scope**
+  - [x] Add copy button to row view.
+  - [x] Display price in row view.
+- [x] **Acceptance**
+  - [x] Row view remains compact and readable.
 
 ---
 
@@ -629,23 +634,23 @@ Clicking a menu opens a shadcn sticky-footer dialog with copy action.
 ## Tickets
 
 ### S8-T1: Create `MenuDialogStickyFooter` component
-- [ ] **Scope**
-  - [ ] Build a reusable dialog using the sticky footer structure from `sticky_footer_dialog.tsx`.
-  - [ ] Render:
-    - [ ] title
-    - [ ] description (optional)
-    - [ ] tags + locations chips
-    - [ ] menuContent as plain text (preserve line breaks)
-  - [ ] Footer includes Copy + Close.
-- [ ] **Acceptance**
-  - [ ] Dialog scrolls content; footer stays visible.
+- [x] **Scope**
+  - [x] Build a reusable dialog using the sticky footer structure from `sticky_footer_dialog.tsx`.
+  - [x] Render:
+    - [x] title
+    - [x] description (optional)
+    - [x] tags + locations chips (use a reusable shadcn-based badge/chip component, e.g. `Badge`)
+    - [x] menuContent as plain text (preserve line breaks)
+  - [x] Footer includes Copy + Close.
+- [x] **Acceptance**
+  - [x] Dialog scrolls content; footer stays visible.
 
 ### S8-T2: Wire card click to open the dialog
-- [ ] **Scope**
-  - [ ] Clicking a card opens dialog.
-  - [ ] Copy button does not open dialog.
-- [ ] **Acceptance**
-  - [ ] Matches expected behavior in both grid and row.
+- [x] **Scope**
+  - [x] Clicking a card opens dialog.
+  - [x] Copy button does not open dialog.
+- [x] **Acceptance**
+  - [x] Matches expected behavior in both grid and row.
 
 ---
 
