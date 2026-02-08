@@ -17,10 +17,13 @@ type MenusModel = {
 export function useMenusModel(): {
   model: MenusModel;
   loading: boolean;
+  initialLoading: boolean;
+  refreshing: boolean;
   error: string | null;
   refresh: () => void;
 } {
-  const { data, loading, error, refresh } = useBootstrapData();
+  const { data, loading, initialLoading, refreshing, error, refresh } =
+    useBootstrapData();
 
   const model = React.useMemo<MenusModel>(() => {
     const payload = data;
@@ -47,6 +50,8 @@ export function useMenusModel(): {
   return {
     model,
     loading,
+    initialLoading,
+    refreshing,
     error,
     refresh,
   };

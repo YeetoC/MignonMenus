@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/combobox";
 import { useMenusModel } from "@/hooks/use-menus-model";
 import { uploadMenuImageToSupabase, deleteMenuImageFromSupabase } from "@/lib/convex-upload";
+import { getErrorMessageFromResponse, normalizeNetworkErrorMessage } from "@/lib/http";
 import type { Location, Tag } from "@/lib/read-model";
 import { eurosStringToCents } from "@/lib/money";
 
@@ -67,6 +68,12 @@ export type AddMenuDialogProps = {
 
 export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
   const { model, refresh } = useMenusModel();
+
+  const openerRef = React.useRef<HTMLElement | null>(null);
+
+  if (open && !openerRef.current && typeof document !== "undefined") {
+    openerRef.current = document.activeElement as HTMLElement | null;
+  }
 
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const dialogContentRef = React.useRef<HTMLDivElement | null>(null);
@@ -152,6 +159,12 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
 
   React.useEffect(() => {
     if (!open) {
+      const el = openerRef.current;
+      openerRef.current = null;
+      if (el && typeof document !== "undefined" && document.contains(el)) {
+        el.focus();
+      }
+
       if (imagePath) {
         void deleteMenuImageFromSupabase(imagePath).catch(() => {
           // ignore
@@ -192,23 +205,34 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
 
   const createTag = React.useCallback(
     async (name: string): Promise<Tag | null> => {
-      const res = await fetch("/api/tags", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ name }),
-      });
+      try {
+        const res = await fetch("/api/tags", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({ name }),
+        });
 
-      if (!res.ok) {
-        const json = (await res.json().catch(() => null)) as { error?: string } | null;
-        toast.error(json?.error || `Failed to create tag (${res.status})`);
+        if (!res.ok) {
+          const message = await getErrorMessageFromResponse(
+            res,
+            `Failed to create tag (${res.status})`,
+          );
+          toast.error(message);
+          return null;
+        }
+
+        const tag = (await res.json()) as Tag;
+        setExtraTags((prev) =>
+          prev.some((t) => t.id === tag.id) ? prev : [...prev, tag],
+        );
+        refresh();
+        return tag;
+      } catch (error: unknown) {
+        const message = normalizeNetworkErrorMessage(error, "Failed to create tag");
+        toast.error(message);
         return null;
       }
-
-      const tag = (await res.json()) as Tag;
-      setExtraTags((prev) => (prev.some((t) => t.id === tag.id) ? prev : [...prev, tag]));
-      refresh();
-      return tag;
     },
     [refresh],
   );
@@ -230,7 +254,7 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
         setImagePath(result.path);
         setImageUrl(result.publicUrl);
       } catch (e) {
-        const message = e instanceof Error ? e.message : "Upload failed";
+        const message = normalizeNetworkErrorMessage(e, "Upload failed");
         toast.error(message);
       } finally {
         setImageUploading(false);
@@ -251,7 +275,7 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
       setImagePath(null);
       setImageUrl(null);
     } catch (e) {
-      const message = e instanceof Error ? e.message : "Delete failed";
+      const message = normalizeNetworkErrorMessage(e, "Delete failed");
       toast.error(message);
     } finally {
       setImageUploading(false);
@@ -263,25 +287,37 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
 
   const createLocation = React.useCallback(
     async (name: string): Promise<Location | null> => {
-      const res = await fetch("/api/locations", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ name }),
-      });
+      try {
+        const res = await fetch("/api/locations", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({ name }),
+        });
 
-      if (!res.ok) {
-        const json = (await res.json().catch(() => null)) as { error?: string } | null;
-        toast.error(json?.error || `Failed to create location (${res.status})`);
+        if (!res.ok) {
+          const message = await getErrorMessageFromResponse(
+            res,
+            `Failed to create location (${res.status})`,
+          );
+          toast.error(message);
+          return null;
+        }
+
+        const location = (await res.json()) as Location;
+        setExtraLocations((prev) =>
+          prev.some((l) => l.id === location.id) ? prev : [...prev, location],
+        );
+        refresh();
+        return location;
+      } catch (error: unknown) {
+        const message = normalizeNetworkErrorMessage(
+          error,
+          "Failed to create location",
+        );
+        toast.error(message);
         return null;
       }
-
-      const location = (await res.json()) as Location;
-      setExtraLocations((prev) =>
-        prev.some((l) => l.id === location.id) ? prev : [...prev, location],
-      );
-      refresh();
-      return location;
     },
     [refresh],
   );
@@ -299,28 +335,35 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
         return;
       }
 
-      const res = await fetch("/api/menus", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          id,
-          title: values.title,
-          description: values.description,
-          menuContent: values.menuContent,
-          status: values.status,
-          pricePerPersonCents: cents,
-          imagePath,
-          tagIds: values.tagIds,
-          locationIds: values.locationIds,
-        }),
-      });
+      try {
+        const res = await fetch("/api/menus", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({
+            id,
+            title: values.title,
+            description: values.description,
+            menuContent: values.menuContent,
+            status: values.status,
+            pricePerPersonCents: cents,
+            imagePath,
+            tagIds: values.tagIds,
+            locationIds: values.locationIds,
+          }),
+        });
 
-      if (!res.ok) {
-        const json = (await res.json().catch(() => null)) as
-          | { error?: string; details?: unknown }
-          | null;
-        toast.error(json?.error || `Failed to create menu (${res.status})`);
+        if (!res.ok) {
+          const message = await getErrorMessageFromResponse(
+            res,
+            `Failed to create menu (${res.status})`,
+          );
+          toast.error(message);
+          return;
+        }
+      } catch (error: unknown) {
+        const message = normalizeNetworkErrorMessage(error, "Failed to create menu");
+        toast.error(message);
         return;
       }
 
@@ -484,6 +527,8 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
                   type="button"
                   variant="ghost"
                   size="icon-xs"
+                  aria-label="Add tag"
+                  title="Add tag"
                   onClick={() => setTagRows((prev) => [...prev, ""])}
                 >
                   <Plus className="size-4" />
@@ -588,6 +633,8 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
                           type="button"
                           variant="ghost"
                           size="icon-xs"
+                          aria-label="Remove tag"
+                          title="Remove tag"
                           onClick={() =>
                             setTagRows((prev) => prev.filter((_, i) => i !== index))
                           }
@@ -608,6 +655,8 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
                   type="button"
                   variant="ghost"
                   size="icon-xs"
+                  aria-label="Add location"
+                  title="Add location"
                   onClick={() => setLocationRows((prev) => [...prev, ""])}
                 >
                   <Plus className="size-4" />
@@ -714,6 +763,8 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
                           type="button"
                           variant="ghost"
                           size="icon-xs"
+                          aria-label="Remove location"
+                          title="Remove location"
                           onClick={() =>
                             setLocationRows((prev) =>
                               prev.filter((_, i) => i !== index),

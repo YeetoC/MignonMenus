@@ -91,6 +91,8 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
               variant="ghost"
               size="icon-xs"
               className={cn("rounded-sm", viewMode === "grid" && "bg-muted")}
+              aria-label="Grid view"
+              title="Grid view"
               onClick={() => setViewMode("grid")}
             >
               <LayoutGrid className="size-4" />
@@ -99,6 +101,8 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
               variant="ghost"
               size="icon-xs"
               className={cn("rounded-sm", viewMode === "list" && "bg-muted")}
+              aria-label="List view"
+              title="List view"
               onClick={() => setViewMode("list")}
             >
               <List className="size-4" />
@@ -107,7 +111,13 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="hidden sm:flex">
+              <Button
+                variant="outline"
+                size="sm"
+                className="hidden sm:flex"
+                aria-label="Sort menus"
+                title="Sort"
+              >
                 <ArrowUpDown className="size-4" />
                 <span className="hidden lg:inline">
                   {currentSort?.label.split(" ")[0]}
@@ -140,6 +150,8 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
                   "hidden sm:flex",
                   filterType !== "all" && "border-primary text-primary",
                 )}
+                aria-label="Filter menus"
+                title="Filter"
               >
                 <SlidersHorizontal className="size-4" />
                 <span className="hidden lg:inline">
@@ -193,6 +205,8 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
               href="https://github.com/ln-dev7/square-ui"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Open GitHub"
+              title="GitHub"
             >
               <Github className="size-5" />
             </Link>

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { MenuCard } from "@/components/dashboard/menu-card";
 import { MenuDialogStickyFooter } from "@/components/dashboard/menu-dialog-sticky-footer";
 import { getFilteredMenus } from "@/lib/menus/get-filtered-menus";
+import { getErrorMessageFromResponse, normalizeNetworkErrorMessage } from "@/lib/http";
 import { useMenusModel } from "@/hooks/use-menus-model";
 import { useMenusUiStore } from "@/store/menus-ui-store";
 import {
@@ -19,56 +20,56 @@ import {
 } from "@/hooks/use-bootstrap-data";
 
 async function patchMenuApi(menuId: string, patch: { trashed: boolean }) {
-  const res = await fetch(`/api/menus/${menuId}`, {
-    method: "PATCH",
-    credentials: "include",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(patch),
-  });
+  try {
+    const res = await fetch(`/api/menus/${menuId}`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(patch),
+    });
 
-  if (!res.ok) {
-    let message = `Request failed (${res.status})`;
-    try {
-      const json = (await res.json()) as { error?: string };
-      if (json?.error) {
-        message = json.error;
-      }
-    } catch {
-      // ignore
+    if (!res.ok) {
+      const message = await getErrorMessageFromResponse(res);
+      throw new Error(message);
     }
+
+    return (await res.json()) as {
+      id: string;
+      status: "active" | "archived";
+      deletedAt: string | null;
+      updatedAt: string;
+    };
+  } catch (error: unknown) {
+    const message = normalizeNetworkErrorMessage(
+      error,
+      error instanceof Error ? error.message : "Request failed",
+    );
     throw new Error(message);
   }
-
-  return (await res.json()) as {
-    id: string;
-    status: "active" | "archived";
-    deletedAt: string | null;
-    updatedAt: string;
-  };
 }
 
 async function deleteMenuApi(menuId: string) {
-  const res = await fetch(`/api/menus/${menuId}`, {
-    method: "DELETE",
-    credentials: "include",
-    headers: {
-      Accept: "application/json",
-    },
-  });
+  try {
+    const res = await fetch(`/api/menus/${menuId}`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+      },
+    });
 
-  if (!res.ok) {
-    let message = `Request failed (${res.status})`;
-    try {
-      const json = (await res.json()) as { error?: string };
-      if (json?.error) {
-        message = json.error;
-      }
-    } catch {
-      // ignore
+    if (!res.ok) {
+      const message = await getErrorMessageFromResponse(res);
+      throw new Error(message);
     }
+  } catch (error: unknown) {
+    const message = normalizeNetworkErrorMessage(
+      error,
+      error instanceof Error ? error.message : "Request failed",
+    );
     throw new Error(message);
   }
 }
@@ -194,6 +195,7 @@ export function TrashMenusContent() {
                 <Button
                   type="button"
                   variant="outline"
+                  className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   onClick={() => void handleRestore(openedMenu.id)}
                 >
                   <RotateCcw className="size-4" />
@@ -202,6 +204,7 @@ export function TrashMenusContent() {
                 <Button
                   type="button"
                   variant="destructive"
+                  className="focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   onClick={() => void handleDeletePermanently(openedMenu.id)}
                 >
                   <XCircle className="size-4" />

@@ -3,6 +3,7 @@
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { X } from "lucide-react";
 
 import { useFilteredMenus } from "@/hooks/use-filtered-menus";
@@ -12,7 +13,8 @@ import { MenuCard } from "@/components/dashboard/menu-card";
 import { MenuDialogStickyFooter } from "@/components/dashboard/menu-dialog-sticky-footer";
 
 export function MenusContent() {
-  const { model, filteredMenus, loading, error } = useFilteredMenus();
+  const { model, filteredMenus, initialLoading, error, refresh } =
+    useFilteredMenus();
 
   const {
     viewMode,
@@ -44,12 +46,58 @@ export function MenusContent() {
   const hasActiveFilters =
     selectedTagIds.length > 0 || filterType !== "all" || sortBy !== "date-newest";
 
-  if (loading && !model.payload) {
+  if (initialLoading) {
     return (
       <div className="flex-1 w-full overflow-auto">
         <div className="p-4 md:p-6 space-y-6">
-          <MenusStatsCards />
-          <div className="text-sm text-muted-foreground">Loading menus…</div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-4 p-4 rounded-xl border bg-card"
+              >
+                <Skeleton className="size-10 rounded-lg" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-6 w-14" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {viewMode === "grid" ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="relative flex flex-col rounded-xl border bg-card overflow-hidden"
+                >
+                  <Skeleton className="h-32 w-full rounded-none" />
+                  <div className="p-4 space-y-2">
+                    <Skeleton className="h-5 w-2/3" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-4/5" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {Array.from({ length: 10 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 p-4 rounded-lg border bg-card"
+                >
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-5 w-1/2" />
+                    <Skeleton className="h-4 w-2/3" />
+                  </div>
+                  <Skeleton className="h-8 w-8 rounded-md" />
+                  <Skeleton className="h-8 w-8 rounded-md" />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     );
@@ -61,6 +109,11 @@ export function MenusContent() {
         <div className="p-4 md:p-6 space-y-6">
           <MenusStatsCards />
           <div className="text-sm text-destructive">{error}</div>
+          <div>
+            <Button type="button" variant="outline" size="sm" onClick={refresh}>
+              Retry
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -103,8 +156,11 @@ export function MenusContent() {
                     {filterType === "with-tags" && "With tags"}
                     {filterType === "without-tags" && "Without tags"}
                     <button
+                      type="button"
+                      aria-label="Clear filter"
+                      title="Clear"
                       onClick={() => setFilterType("all")}
-                      className="hover:bg-primary/20 rounded-full p-0.5"
+                      className="hover:bg-primary/20 rounded-full p-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       <X className="size-3" />
                     </button>
@@ -117,8 +173,11 @@ export function MenusContent() {
                   >
                     {tag.name}
                     <button
+                      type="button"
+                      aria-label={`Remove tag ${tag.name}`}
+                      title="Remove"
                       onClick={() => toggleTagId(tag.id)}
-                      className="hover:bg-primary-foreground/20 rounded-full p-0.5"
+                      className="hover:bg-primary-foreground/20 rounded-full p-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       <X className="size-3" />
                     </button>

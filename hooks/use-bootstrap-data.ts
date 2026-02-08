@@ -2,6 +2,9 @@
 
 import * as React from "react";
 
+import { toast } from "sonner";
+
+import { getErrorMessageFromResponse, normalizeNetworkErrorMessage } from "@/lib/http";
 import type { BootstrapPayload, Menu, MenuStatus } from "@/lib/read-model";
 
 type BootstrapState = {
@@ -17,6 +20,8 @@ let state: BootstrapState = {
 };
 
 let inFlight: Promise<BootstrapPayload> | null = null;
+
+let lastBackgroundErrorToast: { message: string; atMs: number } | null = null;
 
 const listeners = new Set<() => void>();
 
@@ -38,6 +43,19 @@ function subscribe(listener: () => void) {
 
 function getSnapshot() {
   return state;
+}
+
+function maybeToastBackgroundError(message: string) {
+  const now = Date.now();
+  if (
+    lastBackgroundErrorToast &&
+    lastBackgroundErrorToast.message === message &&
+    now - lastBackgroundErrorToast.atMs < 10_000
+  ) {
+    return;
+  }
+  lastBackgroundErrorToast = { message, atMs: now };
+  toast.error(message);
 }
 
 export function patchBootstrapPayload(
@@ -132,15 +150,7 @@ async function loadBootstrapPayload(force: boolean): Promise<BootstrapPayload> {
     },
   }).then(async (res) => {
     if (!res.ok) {
-      let message = `Request failed (${res.status})`;
-      try {
-        const json = (await res.json()) as { error?: string };
-        if (json?.error) {
-          message = json.error;
-        }
-      } catch {
-        // ignore
-      }
+      const message = await getErrorMessageFromResponse(res);
       throw new Error(message);
     }
 
@@ -154,15 +164,26 @@ async function loadBootstrapPayload(force: boolean): Promise<BootstrapPayload> {
     setState({ data, error: null, loading: false });
     return data;
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
+    const message = normalizeNetworkErrorMessage(
+      error,
+      error instanceof Error ? error.message : String(error),
+    );
     setState({ data: existingData, error: message, loading: false });
+
+    if (existingData) {
+      maybeToastBackgroundError(message);
+    }
     throw error;
   } finally {
     inFlight = null;
   }
 }
 
-export function useBootstrapData(): BootstrapState & { refresh: () => void } {
+export function useBootstrapData(): BootstrapState & {
+  refresh: () => void;
+  initialLoading: boolean;
+  refreshing: boolean;
+} {
   const snapshot = React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 
   React.useEffect(() => {
@@ -170,15 +191,17 @@ export function useBootstrapData(): BootstrapState & { refresh: () => void } {
       return;
     }
 
-    void loadBootstrapPayload(false);
+    void loadBootstrapPayload(false).catch(() => undefined);
   }, [snapshot.data, snapshot.error]);
 
   const refresh = React.useCallback(() => {
-    void loadBootstrapPayload(true);
+    void loadBootstrapPayload(true).catch(() => undefined);
   }, []);
 
   return {
     ...snapshot,
     refresh,
+    initialLoading: snapshot.loading && !snapshot.data,
+    refreshing: snapshot.loading && Boolean(snapshot.data),
   };
 }

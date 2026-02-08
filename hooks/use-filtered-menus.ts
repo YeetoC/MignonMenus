@@ -8,7 +8,8 @@ import { useMenusModel } from "@/hooks/use-menus-model";
 import { useMenusUiStore } from "@/store/menus-ui-store";
 
 export function useFilteredMenus() {
-  const { model, loading, error, refresh } = useMenusModel();
+  const { model, loading, initialLoading, refreshing, error, refresh } =
+    useMenusModel();
 
   const {
     selectedLocationId,
@@ -48,6 +49,8 @@ export function useFilteredMenus() {
     model,
     filteredMenus,
     loading,
+    initialLoading,
+    refreshing,
     error,
     refresh,
   };

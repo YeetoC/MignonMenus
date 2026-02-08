@@ -168,8 +168,11 @@ export function MenusSidebar({
         <SidebarGroup className="p-0">
           <SidebarGroupLabel className="flex items-center gap-1.5 px-0 text-[10px] font-semibold tracking-wider text-muted-foreground">
             <button
+              type="button"
+              aria-label={locationsOpen ? "Collapse locations" : "Expand locations"}
+              title={locationsOpen ? "Collapse locations" : "Expand locations"}
               onClick={() => setLocationsOpen(!locationsOpen)}
-              className="flex items-center gap-1.5 cursor-pointer"
+              className="flex items-center gap-1.5 cursor-pointer rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               <ChevronDown
                 className={cn(
@@ -271,8 +274,11 @@ export function MenusSidebar({
         <SidebarGroup className="p-0">
           <SidebarGroupLabel className="flex items-center gap-1.5 px-0 text-[10px] font-semibold tracking-wider text-muted-foreground">
             <button
+              type="button"
+              aria-label={tagsOpen ? "Collapse tags" : "Expand tags"}
+              title={tagsOpen ? "Collapse tags" : "Expand tags"}
               onClick={() => setTagsOpen(!tagsOpen)}
-              className="flex items-center gap-1.5 cursor-pointer"
+              className="flex items-center gap-1.5 cursor-pointer rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               <ChevronDown
                 className={cn(
@@ -284,11 +290,14 @@ export function MenusSidebar({
             </button>
             {selectedTagIds.length > 0 && (
               <button
+                type="button"
+                aria-label="Clear selected tags"
+                title="Clear"
                 onClick={(e) => {
                   e.stopPropagation();
                   clearTagIds();
                 }}
-                className="ml-auto text-[10px] text-muted-foreground hover:text-foreground"
+                className="ml-auto text-[10px] text-muted-foreground hover:text-foreground rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Clear
               </button>
@@ -299,10 +308,17 @@ export function MenusSidebar({
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {model.tags.map((tag) => (
                   <button
+                    type="button"
                     key={tag.id}
+                    aria-pressed={selectedTagIds.includes(tag.id)}
+                    aria-label={
+                      selectedTagIds.includes(tag.id)
+                        ? `Remove tag filter ${tag.name}`
+                        : `Add tag filter ${tag.name}`
+                    }
                     onClick={() => toggleTagId(tag.id)}
                     className={cn(
-                      "inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-colors",
+                      "inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                       selectedTagIds.includes(tag.id)
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted text-muted-foreground hover:text-foreground",

@@ -9,6 +9,7 @@ import { Copy, Heart, UtensilsCrossed } from "lucide-react";
 
 import type { Menu } from "@/lib/read-model";
 import { copyTextToClipboard } from "@/lib/clipboard";
+import { normalizeNetworkErrorMessage } from "@/lib/http";
 import { centsToEurosString } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -74,7 +75,10 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
       }
     } catch (error: unknown) {
       setMenuIsFavorite(menu.id, !next);
-      const message = error instanceof Error ? error.message : "Could not toggle favorite";
+      const message = normalizeNetworkErrorMessage(
+        error,
+        error instanceof Error ? error.message : "Could not toggle favorite",
+      );
       toast.error(message);
       refresh();
     } finally {
@@ -87,7 +91,7 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
       <div className="group flex items-center gap-3 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
         <button
           type="button"
-          className="flex-1 min-w-0 text-left cursor-pointer"
+          className="flex-1 min-w-0 text-left cursor-pointer rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           onClick={onClick}
         >
           <h3 className="font-medium truncate">{menu.title}</h3>
@@ -109,6 +113,8 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
             type="button"
             variant="ghost"
             size="icon-xs"
+            aria-label="Copy menu content"
+            title="Copy"
             onClick={(e) => {
               e.stopPropagation();
               void handleCopyMenuContent();
@@ -121,6 +127,8 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
             variant="ghost"
             size="icon-xs"
             disabled={favoritePending}
+            aria-label={menu.isFavorite ? "Unfavorite" : "Favorite"}
+            title={menu.isFavorite ? "Unfavorite" : "Favorite"}
             onClick={(e) => {
               e.stopPropagation();
               void handleToggleFavorite();
@@ -146,6 +154,8 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
           variant="secondary"
           size="icon-xs"
           className="bg-background/80 backdrop-blur-sm"
+          aria-label="Copy menu content"
+          title="Copy"
           onClick={async (e) => {
             e.stopPropagation();
             await handleCopyMenuContent();
@@ -158,6 +168,8 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
           size="icon-xs"
           className="bg-background/80 backdrop-blur-sm"
           disabled={favoritePending}
+          aria-label={menu.isFavorite ? "Unfavorite" : "Favorite"}
+          title={menu.isFavorite ? "Unfavorite" : "Favorite"}
           onClick={(e) => {
             e.stopPropagation();
             void handleToggleFavorite();
@@ -180,7 +192,7 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
 
       <button
         type="button"
-        className="w-full text-left cursor-pointer"
+        className="w-full text-left cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         onClick={onClick}
       >
         <div className="relative h-32 bg-linear-to-br from-muted/50 to-muted flex items-center justify-center">

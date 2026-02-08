@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import * as React from "react";
 
 import type { Location, Menu, Tag } from "@/lib/read-model";
 import { copyTextToClipboard } from "@/lib/clipboard";
@@ -25,7 +25,7 @@ export type MenuDialogStickyFooterProps = {
   menu: Menu;
   tags: Tag[];
   locations: Location[];
-  footerActions?: ReactNode;
+  footerActions?: React.ReactNode;
 };
 
 export function MenuDialogStickyFooter({

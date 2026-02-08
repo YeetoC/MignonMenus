@@ -843,35 +843,53 @@ Make it feel like a premium internal tool: fast, accessible, consistent, resilie
 ## Tickets
 
 ### S11-T1: Loading/skeleton strategy without breaking SPA feel
-- [ ] **Scope**
-  - [ ] Only show skeletons on first app load.
-  - [ ] Never flash empty state when switching filters.
-- [ ] **Acceptance**
-  - [ ] Switching location/tags feels instant.
+- [x] **Scope**
+  - [x] Define explicit states:
+    - [x] `initialLoading` = bootstrap request in flight and no payload yet.
+    - [x] `refreshing` = bootstrap request in flight but previous payload exists.
+  - [x] Only show skeletons during `initialLoading` (first app load).
+  - [x] During `refreshing`, keep rendering existing menus and avoid visual jumps.
+  - [x] Never flash empty state when switching filters (tags/location/search/sort/filterType).
+- [x] **Acceptance**
+  - [x] First load shows skeletons; after payload exists, the page never blanks during refresh.
+  - [x] Switching location/tags/search/sort feels instant (no skeletons and no empty-state flash caused by loading).
 
 ### S11-T2: Keyboard + accessibility pass
-- [ ] **Scope**
-  - [ ] Dialog focus management.
-  - [ ] Combobox keyboard navigation.
-  - [ ] Buttons have labels/aria where needed.
-- [ ] **Acceptance**
-  - [ ] Works well without mouse.
+- [x] **Scope**
+  - [x] Dialog focus management (open focus target is predictable; focus returns to opener on close).
+  - [x] Combobox keyboard navigation (arrow keys, Enter select, Escape close, Tab exits cleanly).
+  - [x] Icon-only buttons have accessible names (`aria-label` or visible label).
+  - [x] Ensure focus styles are visible (especially in dark mode).
+- [x] **Acceptance**
+  - [x] You can complete primary flows without a mouse:
+    - [x] open menu dialog from a card
+    - [x] copy menu content
+    - [x] toggle favorite
+    - [x] add a menu with tags/locations
 
 ### S11-T3: Error handling pass
-- [ ] **Scope**
-  - [ ] Copy failures.
-  - [ ] Upload failures.
-  - [ ] API errors.
-  - [ ] “Offline-ish” behavior (graceful messaging).
-- [ ] **Acceptance**
-  - [ ] No silent failures.
+- [x] **Scope**
+  - [x] Copy failures are surfaced (toast) and do not silently fail.
+  - [x] Upload failures show actionable messages (invalid type/size/network) and keep the form usable.
+  - [x] API errors:
+    - [x] surface user-action errors (create/update/delete) clearly
+    - [x] surface background refresh errors (keep old data, notify once)
+  - [x] “Offline-ish” behavior: on network failures show graceful messaging and allow retry.
+- [x] **Acceptance**
+  - [x] No silent failures: every failed user action results in visible feedback.
+  - [x] Background refresh failures do not blank the UI and are still discoverable (e.g. toast).
 
 ### S11-T4: Visual consistency pass
-- [ ] **Scope**
-  - [ ] Spacing, typography, and icon sizes are consistent.
-  - [ ] Dark mode contrast checks.
-- [ ] **Acceptance**
-  - [ ] Looks cohesive.
+- [x] **Scope**
+  - [x] Spacing, typography, and icon sizes are consistent across grid/list cards and dialogs.
+  - [x] Icon sizing is standardized (e.g. small icon buttons use a consistent icon size).
+  - [x] Dark mode contrast checks.
+  - [x] Quick consistency checklist:
+    - [x] card padding/rounded corners align between variants
+    - [x] filter chips and icon buttons align visually
+    - [x] empty state and loading states use the same spacing scale as the rest of the page
+- [x] **Acceptance**
+  - [x] Looks cohesive.
 
 ---
 
