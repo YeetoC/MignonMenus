@@ -3,9 +3,10 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { useBootstrapData } from "@/hooks/use-bootstrap-data";
 
 export default function Sprint2DevPage() {
-  const [loading, setLoading] = React.useState(true);
+  const { data, error, loading, refresh } = useBootstrapData();
   const [userJson, setUserJson] = React.useState<string>("");
 
   React.useEffect(() => {
@@ -37,17 +38,20 @@ export default function Sprint2DevPage() {
           ),
         );
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => {});
   }, []);
+
+  const bootstrapJson = React.useMemo(() => {
+    if (!data) return "";
+    return JSON.stringify(data, null, 2);
+  }, [data]);
 
   return (
     <div className="p-6 space-y-6">
       <div className="space-y-1">
         <h1 className="text-xl font-semibold">Sprint 2 Harness</h1>
         <p className="text-sm text-muted-foreground">
-          Supabase Auth client + session cookies.
+          Supabase Auth + /api/bootstrap.
         </p>
       </div>
 
@@ -58,6 +62,47 @@ export default function Sprint2DevPage() {
           <div className="rounded-md border p-3">
             <div className="text-sm font-medium mb-2">Current user</div>
             <pre className="text-xs overflow-auto">{userJson}</pre>
+          </div>
+
+          {error ? (
+            <div className="rounded-md border p-3">
+              <div className="text-sm font-medium mb-2">Bootstrap error</div>
+              <pre className="text-xs overflow-auto">{error}</pre>
+            </div>
+          ) : (
+            <>
+              <div className="rounded-md border p-3">
+                <div className="text-sm font-medium mb-2">Bootstrap counts</div>
+                <pre className="text-xs overflow-auto">
+                  {JSON.stringify(
+                    {
+                      menus: data?.menus.length ?? 0,
+                      tags: data?.tags.length ?? 0,
+                      locations: data?.locations.length ?? 0,
+                      favorites: data?.menus.filter((m) => m.isFavorite).length ?? 0,
+                    },
+                    null,
+                    2,
+                  )}
+                </pre>
+              </div>
+
+              <div className="rounded-md border p-3">
+                <div className="text-sm font-medium mb-2">Bootstrap payload</div>
+                <pre className="text-xs overflow-auto">{bootstrapJson}</pre>
+              </div>
+            </>
+          )}
+
+          <div>
+            <Button
+              variant="outline"
+              onClick={() => {
+                refresh();
+              }}
+            >
+              Refresh bootstrap
+            </Button>
           </div>
 
           <div>

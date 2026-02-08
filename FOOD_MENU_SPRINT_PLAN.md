@@ -403,43 +403,52 @@ Create the authoritative Postgres schema in Supabase and lock it down with RLS.
 # Sprint 4 — Read Model Bootstrap API (fetch once, filter locally)
 
 ## Goal
-Provide a single API call that returns the UI’s denormalized “everything needed to render” dataset.
+Provide a single API call that returns the UI’s denormalized “everything needed to render” dataset (prefer lookup tables + join tables, filter locally).
 
 ## Tickets
 
 ### S4-T1: Define shared TypeScript types for the read model
-- [ ] **Scope**
-  - [ ] Define `Menu`, `Tag`, `Location`, and `BootstrapPayload` types matching UI needs.
-  - [ ] Include `imageUrl` and `isFavorite` on the menu read model.
-- [ ] **Acceptance**
-  - [ ] The UI can type-check end-to-end using these types.
+- [x] **Scope**
+  - [x] Generate Supabase DB types and use them as the source of truth.
+  - [x] Define read-model types matching UI needs (avoid leaking DB `snake_case` into UI-facing types).
+  - [x] Define `Menu`, `Tag`, `Location`, and `BootstrapPayload` types.
+  - [x] Include `imageUrl` and `isFavorite` on the menu read model.
+  - [x] Include `createdAt` and `updatedAt` on menus (canonical sort keys).
+- [x] **Acceptance**
+  - [x] UI code can type-check end-to-end using these types.
+  - [x] A clear mapping exists between DB row types and read-model types.
 
 ### S4-T2: Implement `GET /api/bootstrap` Route Handler
-- [ ] **Scope**
-  - [ ] Create a route handler that:
-    - [ ] verifies auth (server-side)
-    - [ ] reads menus + tags + locations
-    - [ ] joins tags/locations onto menus (or returns ids plus lookup tables)
-    - [ ] includes `isFavorite` for the current user
-  - [ ] Return sorted menus by `updatedAt desc`, then `title`.
-- [ ] **Acceptance**
-  - [ ] One HTTP request returns all data needed to render the dashboard.
+- [x] **Scope**
+  - [x] Create a route handler that:
+    - [x] verifies auth (server-side) and returns JSON `401` (no redirects)
+    - [x] reads menus + tags + locations + join tables + favorites
+    - [x] returns a payload shape that avoids N+1 queries (prefer lookup tables + join tables / ids)
+    - [x] includes `isFavorite` for the current user (or a favorites list to compute it)
+    - [x] maps DB `snake_case` columns to read-model `camelCase`
+  - [x] Return sorted menus by `updatedAt desc`, then `title`.
+  - [x] Ensure response caching behavior is explicit (e.g. no-store) so “fetch once” is a client concern.
+- [x] **Acceptance**
+  - [x] One HTTP request returns all data needed to render the dashboard.
+  - [x] Unauthenticated requests receive a JSON `401`.
 
 ### S4-T3: Add a client hook to load bootstrap data once
-- [ ] **Scope**
-  - [ ] Create `hooks/use-bootstrap-data.ts` that:
-    - [ ] fetches `/api/bootstrap` once
-    - [ ] exposes loading/error/data
-  - [ ] Ensure there’s no “flash of empty state” after first load.
-- [ ] **Acceptance**
-  - [ ] Filter clicks stay instant because filtering is local.
+- [x] **Scope**
+  - [x] Create `hooks/use-bootstrap-data.ts` that:
+    - [x] fetches `/api/bootstrap` once
+    - [x] exposes loading/error/data
+    - [x] exposes `refresh()` (even if unused in Sprint 4)
+  - [x] Ensure there’s no “flash of empty state” after first load (cache the successful payload in memory).
+  - [x] Multiple components using the hook do not trigger multiple fetches.
+- [x] **Acceptance**
+  - [x] Filter clicks stay instant because filtering is local.
 
 ### S4-T4: Replace the Sprint 2 dev harness page with a Supabase harness
-- [ ] **Scope**
-  - [ ] Update the dev page to call `/api/bootstrap`.
-  - [ ] Render counts and raw JSON for sanity checks.
-- [ ] **Acceptance**
-  - [ ] Dev harness proves data loading works without Convex.
+- [x] **Scope**
+  - [x] Update the dev page to call `/api/bootstrap`.
+  - [x] Render counts and raw JSON for sanity checks.
+- [x] **Acceptance**
+  - [x] Dev harness proves data loading works without Convex.
 
 ---
 
