@@ -459,17 +459,26 @@ Swap the UI from mock bookmarks to real menus, while preserving instant filterin
 
 ## Tickets
 
+### S5-T0: Remove sidebar search UI (use header search only)
+- [ ] **Scope**
+  - [ ] Remove the search input from the sidebar.
+  - [ ] Keep a single canonical search input in the header wired to Zustand UI state.
+- [ ] **Acceptance**
+  - [ ] Search UX is consistent (no duplicate search bars).
+
 ### S5-T1: Rename domain types and UI copy (Bookmarks -> Menus)
 - [ ] **Scope**
   - [ ] Replace `Bookmark` types with `Menu` types.
   - [ ] Update visible labels (Bookmarks -> Menus; Collections -> Locations).
+  - [ ] Keep `/favorites`, `/archive`, and `/trash` temporarily bookmark-based and isolated from the new menus data model (until Sprint 10).
 - [ ] **Acceptance**
   - [ ] UI text matches the new domain.
 
 ### S5-T2: Split UI state store from server data
 - [ ] **Scope**
   - [ ] Keep Zustand for UI state only.
-  - [ ] Move server-loaded data (menus/tags/locations) into a dedicated hook/context.
+  - [ ] Move server-loaded data (menus/tags/locations) into a dedicated hook/context built on top of `useBootstrapData()`.
+  - [ ] Create a small read-model adapter (best guess: `useMenusModel`) that provides lookup maps and derived values to keep components simple.
 - [ ] **Acceptance**
   - [ ] UI state changes do not refetch data.
 
@@ -478,9 +487,13 @@ Swap the UI from mock bookmarks to real menus, while preserving instant filterin
   - [ ] Implement filtering + sorting for:
     - [ ] location (All / Unassigned / specific location)
     - [ ] tag multi-filter
-    - [ ] search (title + description)
+    - [ ] search (title + description only)
     - [ ] favorites / with-tags / without-tags
-    - [ ] sorting (`updatedAt desc`, then `title`)
+    - [ ] sorting (best guess: keep existing sort modes but map them to menus)
+      - [ ] date-newest: `updatedAt desc`, then `title`
+      - [ ] date-oldest: `updatedAt asc`, then `title`
+      - [ ] alpha-az: `title asc`, then `updatedAt desc`
+      - [ ] alpha-za: `title desc`, then `updatedAt desc`
 - [ ] **Acceptance**
   - [ ] Grid/list/tabs use the same selector output.
 
@@ -489,6 +502,7 @@ Swap the UI from mock bookmarks to real menus, while preserving instant filterin
   - [ ] Sidebar renders locations from bootstrap payload.
   - [ ] Selected location stored in Zustand.
   - [ ] Clicking a location clears tag selection.
+  - [ ] Compute sidebar counts client-side from menus (no hardcoded counts).
 - [ ] **Acceptance**
   - [ ] Switching locations is instant after initial load.
 
@@ -503,8 +517,11 @@ Swap the UI from mock bookmarks to real menus, while preserving instant filterin
 - [ ] **Scope**
   - [ ] Render menu cards from the canonical filtered list.
   - [ ] Remove mock bookmarks usage from content components.
+  - [ ] Keep menu rendering minimal in Sprint 5 (best guess: a simple menu list/grid item component that only renders title + description).
+  - [ ] Do not refactor `BookmarkCard` in Sprint 5; defer the deeper card refactor (replacing URL/favicon behaviors, copy/price/image UI) to Sprint 7.
 - [ ] **Acceptance**
   - [ ] The dashboard renders Supabase-backed menus.
+  - [ ] The home dashboard does not import `mock-data/bookmarks`.
 
 ---
 
@@ -552,6 +569,14 @@ Support optional menu images via Supabase Storage.
 Implement the requested card UI changes and copy behavior.
 
 ## Tickets
+
+### S7-T0: Refactor bookmark cards into menu cards (deferred from Sprint 5)
+- [ ] **Scope**
+  - [ ] Replace `BookmarkCard` usage with a `MenuCard` (or equivalent) that renders menu fields.
+  - [ ] Remove bookmark-only behaviors (open URL, copy URL, favicon assumptions).
+  - [ ] Ensure grid and row variants are supported.
+- [ ] **Acceptance**
+  - [ ] The dashboard renders menus using a menu-native card component.
 
 ### S7-T1: Grid card image slot (optional)
 - [ ] **Scope**

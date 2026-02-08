@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
+
 import {
   Sidebar,
   SidebarContent,
@@ -29,7 +29,6 @@ import {
 import { cn } from "@/lib/utils";
 import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
 import {
-  Bookmark,
   ChevronDown,
   ChevronRight,
   Settings,
@@ -40,26 +39,14 @@ import {
   LogOut,
   Folder,
   Star,
-  Code,
-  Palette,
-  Wrench,
-  BookOpen,
-  Sparkles,
   Tag,
   Archive,
   Trash2,
+  MapPin,
 } from "lucide-react";
-import { useBookmarksStore } from "@/store/bookmarks-store";
-import { collections, tags } from "@/mock-data/bookmarks";
 
-const collectionIcons: Record<string, React.ElementType> = {
-  bookmark: Bookmark,
-  palette: Palette,
-  code: Code,
-  wrench: Wrench,
-  "book-open": BookOpen,
-  sparkles: Sparkles,
-};
+import { useMenusModel } from "@/hooks/use-menus-model";
+import { useMenusUiStore } from "@/store/menus-ui-store";
 
 const navItems = [
   { icon: Star, label: "Favorites", href: "/favorites" },
@@ -67,22 +54,35 @@ const navItems = [
   { icon: Trash2, label: "Trash", href: "/trash" },
 ];
 
-export function BookmarksSidebar({
+function countForLocation(menus: { locationIds: string[]; deletedAt: string | null }[], locationId: string) {
+  return menus.filter((m) => !m.deletedAt && m.locationIds.includes(locationId)).length;
+}
+
+function countUnassigned(menus: { locationIds: string[]; deletedAt: string | null }[]) {
+  return menus.filter((m) => !m.deletedAt && m.locationIds.length === 0).length;
+}
+
+export function MenusSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const router = useRouter();
-  const [collectionsOpen, setCollectionsOpen] = React.useState(true);
+  const [locationsOpen, setLocationsOpen] = React.useState(true);
   const [tagsOpen, setTagsOpen] = React.useState(true);
+
+  const { model } = useMenusModel();
+
   const {
-    selectedCollection,
-    setSelectedCollection,
-    selectedTags,
-    toggleTag,
-    clearTags,
-  } = useBookmarksStore();
+    selectedLocationId,
+    setSelectedLocationId,
+    selectedTagIds,
+    toggleTagId,
+    clearTagIds,
+  } = useMenusUiStore();
 
   const isHomePage = pathname === "/";
+
+  const menusForCounts = model.menus;
 
   return (
     <Sidebar collapsible="offcanvas" className="lg:border-r-0!" {...props}>
@@ -92,7 +92,7 @@ export function BookmarksSidebar({
             <DropdownMenuTrigger className="flex items-center gap-2 outline-none">
               <div className="size-7 rounded-full overflow-hidden bg-linear-to-br from-blue-400 via-indigo-500 to-violet-500 flex items-center justify-center ring-1 ring-white/40 shadow-lg" />
               <span className="font-medium text-muted-foreground">
-                Square UI
+                MignonMenus
               </span>
               <ChevronDown className="size-3 text-muted-foreground" />
             </DropdownMenuTrigger>
@@ -102,16 +102,8 @@ export function BookmarksSidebar({
               </DropdownMenuLabel>
               <DropdownMenuItem>
                 <div className="size-5 rounded-full bg-linear-to-br from-blue-400 via-indigo-500 to-violet-500 mr-2" />
-                Square UI
+                MignonMenus
                 <Check className="size-4 ml-auto" />
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <div className="size-5 rounded-full bg-linear-to-br from-emerald-400 to-cyan-500 mr-2" />
-                Personal
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <div className="size-5 rounded-full bg-linear-to-br from-orange-400 to-rose-500 mr-2" />
-                Work
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
@@ -176,28 +168,76 @@ export function BookmarksSidebar({
         <SidebarGroup className="p-0">
           <SidebarGroupLabel className="flex items-center gap-1.5 px-0 text-[10px] font-semibold tracking-wider text-muted-foreground">
             <button
-              onClick={() => setCollectionsOpen(!collectionsOpen)}
+              onClick={() => setLocationsOpen(!locationsOpen)}
               className="flex items-center gap-1.5 cursor-pointer"
             >
               <ChevronDown
                 className={cn(
                   "size-3.5 transition-transform",
-                  !collectionsOpen && "-rotate-90"
+                  !locationsOpen && "-rotate-90",
                 )}
               />
-              COLLECTIONS
+              LOCATIONS
             </button>
           </SidebarGroupLabel>
-          {collectionsOpen && (
+          {locationsOpen && (
             <SidebarGroupContent>
               <SidebarMenu className="mt-2">
-                {collections.map((collection) => {
-                  const IconComponent =
-                    collectionIcons[collection.icon] || Folder;
-                  const isActive =
-                    isHomePage && selectedCollection === collection.id;
+                <SidebarMenuItem key="all">
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isHomePage && selectedLocationId === "all"}
+                    className="h-[38px]"
+                  >
+                    <Link
+                      href="/"
+                      onClick={() => {
+                        setSelectedLocationId("all");
+                        clearTagIds();
+                      }}
+                    >
+                      <Folder className="size-5" />
+                      <span className="flex-1">All Menus</span>
+                      <span className="text-muted-foreground text-xs">
+                        {menusForCounts.filter((m) => !m.deletedAt).length}
+                      </span>
+                      {isHomePage && selectedLocationId === "all" && (
+                        <ChevronRight className="size-4 text-muted-foreground opacity-60" />
+                      )}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+
+                <SidebarMenuItem key="unassigned">
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isHomePage && selectedLocationId === "unassigned"}
+                    className="h-[38px]"
+                  >
+                    <Link
+                      href="/"
+                      onClick={() => {
+                        setSelectedLocationId("unassigned");
+                        clearTagIds();
+                      }}
+                    >
+                      <MapPin className="size-5" />
+                      <span className="flex-1">Unassigned</span>
+                      <span className="text-muted-foreground text-xs">
+                        {countUnassigned(menusForCounts)}
+                      </span>
+                      {isHomePage && selectedLocationId === "unassigned" && (
+                        <ChevronRight className="size-4 text-muted-foreground opacity-60" />
+                      )}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+
+                {model.locations.map((location) => {
+                  const isActive = isHomePage && selectedLocationId === location.id;
+
                   return (
-                    <SidebarMenuItem key={collection.id}>
+                    <SidebarMenuItem key={location.id}>
                       <SidebarMenuButton
                         asChild
                         isActive={isActive}
@@ -206,14 +246,14 @@ export function BookmarksSidebar({
                         <Link
                           href="/"
                           onClick={() => {
-                            setSelectedCollection(collection.id);
-                            clearTags();
+                            setSelectedLocationId(location.id);
+                            clearTagIds();
                           }}
                         >
-                          <IconComponent className="size-5" />
-                          <span className="flex-1">{collection.name}</span>
+                          <MapPin className="size-5" />
+                          <span className="flex-1">{location.name}</span>
                           <span className="text-muted-foreground text-xs">
-                            {collection.count}
+                            {countForLocation(menusForCounts, location.id)}
                           </span>
                           {isActive && (
                             <ChevronRight className="size-4 text-muted-foreground opacity-60" />
@@ -237,16 +277,16 @@ export function BookmarksSidebar({
               <ChevronDown
                 className={cn(
                   "size-3.5 transition-transform",
-                  !tagsOpen && "-rotate-90"
+                  !tagsOpen && "-rotate-90",
                 )}
               />
               TAGS
             </button>
-            {selectedTags.length > 0 && (
+            {selectedTagIds.length > 0 && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  clearTags();
+                  clearTagIds();
                 }}
                 className="ml-auto text-[10px] text-muted-foreground hover:text-foreground"
               >
@@ -257,15 +297,15 @@ export function BookmarksSidebar({
           {tagsOpen && (
             <SidebarGroupContent>
               <div className="flex flex-wrap gap-1.5 mt-2">
-                {tags.map((tag) => (
+                {model.tags.map((tag) => (
                   <button
                     key={tag.id}
-                    onClick={() => toggleTag(tag.id)}
+                    onClick={() => toggleTagId(tag.id)}
                     className={cn(
                       "inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-colors",
-                      selectedTags.includes(tag.id)
+                      selectedTagIds.includes(tag.id)
                         ? "bg-primary text-primary-foreground"
-                        : tag.color
+                        : "bg-muted text-muted-foreground hover:text-foreground",
                     )}
                   >
                     <Tag className="size-3" />
