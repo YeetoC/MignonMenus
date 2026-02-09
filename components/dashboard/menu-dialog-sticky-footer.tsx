@@ -3,7 +3,7 @@
 import * as React from "react";
 
 import type { Location, Menu, Tag } from "@/lib/read-model";
-import { copyTextToClipboard } from "@/lib/clipboard";
+import { copyRichTextToClipboard, copyTextToClipboard } from "@/lib/clipboard";
 
 import { toast } from "sonner";
 
@@ -37,7 +37,12 @@ export function MenuDialogStickyFooter({
   footerActions,
 }: MenuDialogStickyFooterProps) {
   const handleCopy = async () => {
-    const ok = await copyTextToClipboard(menu.menuContent);
+    const ok = menu.menuContentHtml
+      ? await copyRichTextToClipboard({
+          html: menu.menuContentHtml,
+          plain: menu.menuContent,
+        })
+      : await copyTextToClipboard(menu.menuContent);
     if (ok) {
       toast.success("Kopiert");
     } else {
@@ -90,9 +95,16 @@ export function MenuDialogStickyFooter({
             </div>
           )}
 
-          <div className="whitespace-pre-wrap text-sm leading-relaxed">
-            {menu.menuContent}
-          </div>
+          {menu.menuContentHtml ? (
+            <div
+              className="text-sm leading-relaxed [&_p]:mb-2 [&_p:last-child]:mb-0 [&_div]:mb-2 [&_div:last-child]:mb-0 [&_ul]:list-disc [&_ol]:list-decimal [&_ul,&_ol]:pl-6 [&_li]:my-1 [&_table]:my-2 [&_table]:w-full [&_table]:border-collapse [&_td]:align-top [&_th]:align-top [&_td]:border [&_th]:border [&_td]:border-border [&_th]:border-border [&_td]:p-2 [&_th]:p-2"
+              dangerouslySetInnerHTML={{ __html: menu.menuContentHtml }}
+            />
+          ) : (
+            <div className="whitespace-pre-wrap text-sm leading-relaxed">
+              {menu.menuContent}
+            </div>
+          )}
         </div>
 
         <DialogFooter className="shrink-0 border-t bg-background px-6 py-4">

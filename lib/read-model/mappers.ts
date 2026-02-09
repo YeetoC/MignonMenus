@@ -45,6 +45,7 @@ export function mapMenuRow(
     title: row.title,
     description: row.description,
     menuContent: row.menu_content,
+    menuContentHtml: row.menu_content_html ?? null,
     pricePerPersonCents: row.price_per_person_cents,
     imagePath: row.image_path ?? null,
     imageUrl: extras?.imageUrl ?? null,

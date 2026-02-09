@@ -27,3 +27,35 @@ export async function copyTextToClipboard(text: string): Promise<boolean> {
     return false
   }
 }
+
+export async function copyRichTextToClipboard(args: {
+  html: string
+  plain: string
+}): Promise<boolean> {
+  if (typeof window === "undefined") {
+    return false
+  }
+
+  const html = args.html.trim()
+  const plain = args.plain
+
+  try {
+    if (
+      window.isSecureContext &&
+      navigator.clipboard?.write &&
+      typeof ClipboardItem !== "undefined"
+    ) {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": new Blob([html], { type: "text/html" }),
+          "text/plain": new Blob([plain], { type: "text/plain" }),
+        }),
+      ])
+      return true
+    }
+  } catch {
+    // ignore
+  }
+
+  return copyTextToClipboard(plain)
+}

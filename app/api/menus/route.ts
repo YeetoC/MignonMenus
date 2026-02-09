@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { mapMenuRow } from "@/lib/read-model";
+import { sanitizeMenuContentHtml } from "@/lib/menu-content.server";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +13,7 @@ const createMenuSchema = z.object({
   title: z.string().trim().min(1, "Title is required"),
   description: z.string().trim().optional(),
   menuContent: z.string().trim().min(1, "Menu content is required"),
+  menuContentHtml: z.string().trim().nullable().optional(),
   status: z.enum(["active", "archived"]).default("active"),
   pricePerPersonCents: z.number().int().min(0).nullable().optional(),
   imagePath: z.string().trim().min(1).nullable().optional(),
@@ -50,6 +52,12 @@ export async function POST(request: Request) {
 
   const description = input.description?.trim() ? input.description.trim() : null;
 
+  const menuContentHtmlRaw = (input.menuContentHtml ?? "").trim();
+  const menuContentHtmlSanitized = menuContentHtmlRaw
+    ? sanitizeMenuContentHtml(menuContentHtmlRaw)
+    : "";
+  const menuContentHtml = menuContentHtmlSanitized ? menuContentHtmlSanitized : null;
+
   const insertResult = await supabase
     .from("menus")
     .insert({
@@ -57,6 +65,7 @@ export async function POST(request: Request) {
       title: input.title.trim(),
       description,
       menu_content: input.menuContent.trim(),
+      menu_content_html: menuContentHtml,
       status: input.status,
       price_per_person_cents: input.pricePerPersonCents ?? null,
       image_path: input.imagePath ?? null,

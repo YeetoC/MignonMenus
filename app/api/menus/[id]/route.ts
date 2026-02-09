@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { z } from "zod";
 
+import { sanitizeMenuContentHtml } from "@/lib/menu-content.server";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { getSupabaseServiceClient } from "@/lib/supabase/service";
 
@@ -16,6 +17,7 @@ const patchSchema = z
     title: z.string().trim().min(1).optional(),
     description: z.string().trim().nullable().optional(),
     menuContent: z.string().trim().min(1).optional(),
+    menuContentHtml: z.string().trim().nullable().optional(),
     status: z.enum(["active", "archived"]).optional(),
     pricePerPersonCents: z.number().int().min(0).nullable().optional(),
     imagePath: z.string().trim().min(1).nullable().optional(),
@@ -54,6 +56,7 @@ export async function PATCH(
     title,
     description,
     menuContent,
+    menuContentHtml,
     status,
     pricePerPersonCents,
     imagePath,
@@ -66,6 +69,7 @@ export async function PATCH(
     typeof title === "undefined" &&
     typeof description === "undefined" &&
     typeof menuContent === "undefined" &&
+    typeof menuContentHtml === "undefined" &&
     typeof status === "undefined" &&
     typeof pricePerPersonCents === "undefined" &&
     typeof imagePath === "undefined" &&
@@ -97,6 +101,7 @@ export async function PATCH(
     title?: string;
     description?: string | null;
     menu_content?: string;
+    menu_content_html?: string | null;
     status?: "active" | "archived";
     price_per_person_cents?: number | null;
     image_path?: string | null;
@@ -114,6 +119,11 @@ export async function PATCH(
 
   if (typeof menuContent !== "undefined") {
     updates.menu_content = menuContent.trim();
+  }
+
+  if (typeof menuContentHtml !== "undefined") {
+    const trimmed = (menuContentHtml ?? "").trim();
+    updates.menu_content_html = trimmed ? sanitizeMenuContentHtml(trimmed) : null;
   }
 
   if (typeof status !== "undefined") {
@@ -137,6 +147,7 @@ export async function PATCH(
     title: string;
     description: string | null;
     menu_content: string;
+    menu_content_html: string | null;
     price_per_person_cents: number | null;
     image_path: string | null;
     status: string;
@@ -150,7 +161,7 @@ export async function PATCH(
       .update(updates)
       .eq("id", menuId)
       .select(
-        "id, title, description, menu_content, price_per_person_cents, image_path, status, deleted_at, updated_at",
+        "id, title, description, menu_content, menu_content_html, price_per_person_cents, image_path, status, deleted_at, updated_at",
       )
       .single();
 
@@ -167,7 +178,7 @@ export async function PATCH(
     const result = await supabase
       .from("menus")
       .select(
-        "id, title, description, menu_content, price_per_person_cents, image_path, status, deleted_at, updated_at",
+        "id, title, description, menu_content, menu_content_html, price_per_person_cents, image_path, status, deleted_at, updated_at",
       )
       .eq("id", menuId)
       .single();
@@ -258,6 +269,7 @@ export async function PATCH(
       title: menuRow.title,
       description: menuRow.description,
       menuContent: menuRow.menu_content,
+      menuContentHtml: menuRow.menu_content_html,
       pricePerPersonCents: menuRow.price_per_person_cents,
       imagePath: menuRow.image_path,
       imageUrl: imageUrl || null,

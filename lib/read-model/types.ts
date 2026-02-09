@@ -19,6 +19,7 @@ export type Menu = {
   title: string;
   description: string | null;
   menuContent: string;
+  menuContentHtml: string | null;
   pricePerPersonCents: number | null;
   imagePath: string | null;
   imageUrl: string | null;

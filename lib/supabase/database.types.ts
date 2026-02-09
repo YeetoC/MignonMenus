@@ -124,6 +124,7 @@ export type Database = {
           id: string
           image_path: string | null
           menu_content: string
+          menu_content_html: string | null
           price_per_person_cents: number | null
           status: string
           title: string
@@ -136,6 +137,7 @@ export type Database = {
           id?: string
           image_path?: string | null
           menu_content: string
+          menu_content_html?: string | null
           price_per_person_cents?: number | null
           status?: string
           title: string
@@ -148,6 +150,7 @@ export type Database = {
           id?: string
           image_path?: string | null
           menu_content?: string
+          menu_content_html?: string | null
           price_per_person_cents?: number | null
           status?: string
           title?: string

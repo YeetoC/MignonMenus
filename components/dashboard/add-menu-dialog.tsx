@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { MenuContentEditor } from "@/components/dashboard/menu-content-editor";
 import {
   Combobox,
   ComboboxCollection,
@@ -42,6 +42,7 @@ const addMenuSchema = z
     title: z.string().trim().min(1, "Titel ist erforderlich"),
     description: z.string().trim().optional(),
     menuContent: z.string().trim().min(1, "Menüinhalt ist erforderlich"),
+    menuContentHtml: z.string().optional(),
     status: z.enum(["active", "archived"]).default("active"),
     tagIds: z.array(z.string()).default([]),
     locationIds: z.array(z.string()).default([]),
@@ -88,6 +89,7 @@ export function AddMenuDialog({ open, onOpenChange, menu = null }: AddMenuDialog
       title: "",
       description: "",
       menuContent: "",
+      menuContentHtml: "",
       status: "active",
       tagIds: [],
       locationIds: [],
@@ -99,6 +101,8 @@ export function AddMenuDialog({ open, onOpenChange, menu = null }: AddMenuDialog
   React.useEffect(() => {
     form.register("tagIds");
     form.register("locationIds");
+    form.register("menuContent");
+    form.register("menuContentHtml");
   }, [form]);
 
   type Option = { value: string; label: string };
@@ -123,6 +127,7 @@ export function AddMenuDialog({ open, onOpenChange, menu = null }: AddMenuDialog
         title: menu.title,
         description: menu.description ?? "",
         menuContent: menu.menuContent,
+        menuContentHtml: menu.menuContentHtml ?? "",
         status: menu.status,
         tagIds: menu.tagIds,
         locationIds: menu.locationIds,
@@ -393,6 +398,9 @@ export function AddMenuDialog({ open, onOpenChange, menu = null }: AddMenuDialog
               title: values.title,
               description: values.description,
               menuContent: values.menuContent,
+              menuContentHtml: values.menuContentHtml?.trim()
+                ? values.menuContentHtml.trim()
+                : null,
               status: values.status,
               pricePerPersonCents: cents,
               imagePath,
@@ -415,6 +423,7 @@ export function AddMenuDialog({ open, onOpenChange, menu = null }: AddMenuDialog
             title?: string;
             description?: string | null;
             menuContent?: string;
+            menuContentHtml?: string | null;
             pricePerPersonCents?: number | null;
             imagePath?: string | null;
             imageUrl?: string | null;
@@ -434,6 +443,12 @@ export function AddMenuDialog({ open, onOpenChange, menu = null }: AddMenuDialog
                   ? values.description.trim()
                   : null,
             menuContent: json.menuContent ?? values.menuContent.trim(),
+            menuContentHtml:
+              typeof json.menuContentHtml !== "undefined"
+                ? json.menuContentHtml
+                : values.menuContentHtml?.trim()
+                  ? values.menuContentHtml.trim()
+                  : null,
             pricePerPersonCents:
               typeof json.pricePerPersonCents !== "undefined"
                 ? json.pricePerPersonCents
@@ -482,6 +497,9 @@ export function AddMenuDialog({ open, onOpenChange, menu = null }: AddMenuDialog
             title: values.title,
             description: values.description,
             menuContent: values.menuContent,
+            menuContentHtml: values.menuContentHtml?.trim()
+              ? values.menuContentHtml.trim()
+              : null,
             status: values.status,
             pricePerPersonCents: cents,
             imagePath,
@@ -656,12 +674,19 @@ export function AddMenuDialog({ open, onOpenChange, menu = null }: AddMenuDialog
               >
                 Menüinhalt
               </label>
-              <Textarea
+              <MenuContentEditor
                 id="add-menu-content"
                 placeholder="Menütext hier einfügen…"
                 className="min-h-32"
-                aria-invalid={Boolean(errors.menuContent)}
-                {...register("menuContent")}
+                ariaInvalid={Boolean(errors.menuContent)}
+                editorKey={menuId ?? "new"}
+                initialPlainText={form.getValues("menuContent")}
+                initialHtml={form.getValues("menuContentHtml")}
+                onBlur={() => void form.trigger("menuContent")}
+                onChange={({ plainText, html }) => {
+                  form.setValue("menuContent", plainText, { shouldDirty: true });
+                  form.setValue("menuContentHtml", html, { shouldDirty: true });
+                }}
               />
               {errors.menuContent?.message ? (
                 <p className="text-sm text-destructive">

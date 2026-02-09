@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 
 import type { Menu, Tag } from "@/lib/read-model";
-import { copyTextToClipboard } from "@/lib/clipboard";
+import { copyRichTextToClipboard, copyTextToClipboard } from "@/lib/clipboard";
 import {
   getErrorMessageFromResponse,
   normalizeNetworkErrorMessage,
@@ -68,7 +68,12 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
   const [favoritePending, setFavoritePending] = React.useState(false);
 
   const handleCopyMenuContent = async () => {
-    const ok = await copyTextToClipboard(menu.menuContent);
+    const ok = menu.menuContentHtml
+      ? await copyRichTextToClipboard({
+          html: menu.menuContentHtml,
+          plain: menu.menuContent,
+        })
+      : await copyTextToClipboard(menu.menuContent);
     if (ok) {
       toast.success("Kopiert");
     } else {
