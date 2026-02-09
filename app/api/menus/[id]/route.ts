@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import { z } from "zod";
 
@@ -26,9 +26,9 @@ const patchSchema = z
   .strict();
 
 export async function PATCH(
-  request: Request,
-  context: { params: { id: string } },
-) {
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> },
+): Promise<Response> {
   const rawParams = await Promise.resolve(context.params as unknown);
   const parsedParams = paramsSchema.safeParse(rawParams);
 
@@ -276,9 +276,9 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: Request,
-  context: { params: { id: string } },
-) {
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> },
+): Promise<Response> {
   const rawParams = await Promise.resolve(context.params as unknown);
   const parsedParams = paramsSchema.safeParse(rawParams);
 
