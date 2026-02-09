@@ -29,7 +29,14 @@ export function MenusContent() {
 
   const openedMenu = React.useMemo(() => {
     if (!openedMenuId) return null;
-    return model.menus.find((m) => m.id === openedMenuId) ?? null;
+    return (
+      model.menus.find(
+        (m) =>
+          m.id === openedMenuId &&
+          m.status === "active" &&
+          !m.deletedAt,
+      ) ?? null
+    );
   }, [model.menus, openedMenuId]);
 
   React.useEffect(() => {

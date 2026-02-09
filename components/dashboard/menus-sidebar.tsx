@@ -51,12 +51,21 @@ const navItems = [
   { icon: Trash2, label: "Papierkorb", href: "/trash" },
 ];
 
-function countForLocation(menus: { locationIds: string[]; deletedAt: string | null }[], locationId: string) {
-  return menus.filter((m) => !m.deletedAt && m.locationIds.includes(locationId)).length;
+function countForLocation(
+  menus: { locationIds: string[]; deletedAt: string | null; status?: string }[],
+  locationId: string,
+) {
+  return menus
+    .filter((m) => !m.deletedAt)
+    .filter((m) => typeof m.status !== "string" || m.status === "active")
+    .filter((m) => m.locationIds.includes(locationId)).length;
 }
 
-function countUnassigned(menus: { locationIds: string[]; deletedAt: string | null }[]) {
-  return menus.filter((m) => !m.deletedAt && m.locationIds.length === 0).length;
+function countUnassigned(menus: { locationIds: string[]; deletedAt: string | null; status?: string }[]) {
+  return menus
+    .filter((m) => !m.deletedAt)
+    .filter((m) => typeof m.status !== "string" || m.status === "active")
+    .filter((m) => m.locationIds.length === 0).length;
 }
 
 export function MenusSidebar({
@@ -79,7 +88,9 @@ export function MenusSidebar({
 
   const isHomePage = pathname === "/";
 
-  const menusForCounts = model.menus;
+  const menusForCounts = React.useMemo(() => {
+    return model.menus.filter((m) => m.status === "active");
+  }, [model.menus]);
 
   return (
     <Sidebar collapsible="offcanvas" className="lg:border-r-0!" {...props}>

@@ -11,6 +11,10 @@ export function useFilteredMenus() {
   const { model, loading, initialLoading, refreshing, error, refresh } =
     useMenusModel();
 
+  const baseMenus = React.useMemo(() => {
+    return model.menus.filter((m) => m.status === "active" && !m.deletedAt);
+  }, [model.menus]);
+
   const {
     selectedLocationId,
     selectedTagIds,
@@ -29,7 +33,7 @@ export function useFilteredMenus() {
 
   const filteredMenus = React.useMemo(() => {
     return getFilteredMenus({
-      menus: model.menus,
+      menus: baseMenus,
       selectedLocationId,
       selectedTagIds,
       searchQuery,
@@ -37,7 +41,7 @@ export function useFilteredMenus() {
       sortBy,
     });
   }, [
-    model.menus,
+    baseMenus,
     selectedLocationId,
     selectedTagIds,
     searchQuery,

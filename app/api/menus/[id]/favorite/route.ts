@@ -14,7 +14,8 @@ export async function POST(
   _request: Request,
   context: { params: { id: string } },
 ) {
-  const parsedParams = paramsSchema.safeParse(context.params);
+  const rawParams = await Promise.resolve(context.params as unknown);
+  const parsedParams = paramsSchema.safeParse(rawParams);
 
   if (!parsedParams.success) {
     return NextResponse.json(

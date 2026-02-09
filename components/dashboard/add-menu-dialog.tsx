@@ -33,8 +33,9 @@ import {
 import { useMenusModel } from "@/hooks/use-menus-model";
 import { uploadMenuImageToSupabase, deleteMenuImageFromSupabase } from "@/lib/convex-upload";
 import { getErrorMessageFromResponse, normalizeNetworkErrorMessage } from "@/lib/http";
-import type { Location, Tag } from "@/lib/read-model";
-import { eurosStringToCents } from "@/lib/money";
+import type { Location, Menu, Tag } from "@/lib/read-model";
+import { centsToEurosString, eurosStringToCents } from "@/lib/money";
+import { patchMenu } from "@/hooks/use-bootstrap-data";
 
 const addMenuSchema = z
   .object({
@@ -64,10 +65,13 @@ type AddMenuFormValues = z.infer<typeof addMenuSchema>;
 export type AddMenuDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  menu?: Menu | null;
 };
 
-export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
+export function AddMenuDialog({ open, onOpenChange, menu = null }: AddMenuDialogProps) {
   const { model, refresh } = useMenusModel();
+
+  const isEdit = Boolean(menu);
 
   const openerRef = React.useRef<HTMLElement | null>(null);
 
@@ -106,11 +110,39 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
   const [imageUploading, setImageUploading] = React.useState(false);
   const [imagePath, setImagePath] = React.useState<string | null>(null);
   const [imageUrl, setImageUrl] = React.useState<string | null>(null);
+  const [originalImagePath, setOriginalImagePath] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (!open) return;
+    if (menu) {
+      setMenuId(menu.id);
+      setImagePath(menu.imagePath);
+      setImageUrl(menu.imageUrl);
+      setOriginalImagePath(menu.imagePath);
+      form.reset({
+        title: menu.title,
+        description: menu.description ?? "",
+        menuContent: menu.menuContent,
+        status: menu.status,
+        tagIds: menu.tagIds,
+        locationIds: menu.locationIds,
+        priceEuros:
+          menu.pricePerPersonCents != null
+            ? centsToEurosString(menu.pricePerPersonCents).replace(".", ",")
+            : "",
+      });
+      setTagRows(menu.tagIds.length > 0 ? menu.tagIds : [""]);
+      setLocationRows(menu.locationIds.length > 0 ? menu.locationIds : [""]);
+      setTagQueries({});
+      setLocationQueries({});
+      setExtraTags([]);
+      setExtraLocations([]);
+      return;
+    }
+
     setMenuId((prev) => prev ?? crypto.randomUUID());
-  }, [open]);
+    setOriginalImagePath(null);
+  }, [form, menu, open]);
 
   const tagOptions = React.useMemo<Option[]>(() => {
     const byId = new Map<string, Option>();
@@ -166,9 +198,11 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
       }
 
       if (imagePath) {
-        void deleteMenuImageFromSupabase(imagePath).catch(() => {
-          // ignore
-        });
+        if (!originalImagePath || imagePath !== originalImagePath) {
+          void deleteMenuImageFromSupabase(imagePath).catch(() => {
+            // ignore
+          });
+        }
       }
       form.reset();
       setTagRows([""]);
@@ -181,11 +215,12 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
       setImagePath(null);
       setImageUrl(null);
       setImageUploading(false);
+      setOriginalImagePath(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
     }
-  }, [form, imagePath, open]);
+  }, [form, imagePath, open, originalImagePath]);
 
   React.useEffect(() => {
     const ids = Array.from(new Set(tagRows.filter(Boolean)));
@@ -246,10 +281,14 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
 
       try {
         setImageUploading(true);
+        const replacePath =
+          imagePath && (!originalImagePath || imagePath !== originalImagePath)
+            ? imagePath
+            : null;
         const result = await uploadMenuImageToSupabase({
           file,
           menuId: id,
-          existingPath: imagePath,
+          existingPath: replacePath,
         });
         setImagePath(result.path);
         setImageUrl(result.publicUrl);
@@ -263,11 +302,20 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
         }
       }
     },
-    [imagePath, menuId],
+    [imagePath, menuId, originalImagePath],
   );
 
   const handleRemoveImage = React.useCallback(async () => {
     if (!imagePath) return;
+
+    if (isEdit && originalImagePath && imagePath === originalImagePath) {
+      setImagePath(null);
+      setImageUrl(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
 
     try {
       setImageUploading(true);
@@ -283,7 +331,7 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
         fileInputRef.current.value = "";
       }
     }
-  }, [imagePath]);
+  }, [imagePath, isEdit, originalImagePath]);
 
   const createLocation = React.useCallback(
     async (name: string): Promise<Location | null> => {
@@ -335,6 +383,95 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
         return;
       }
 
+      if (menu) {
+        try {
+          const res = await fetch(`/api/menus/${menu.id}`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify({
+              title: values.title,
+              description: values.description,
+              menuContent: values.menuContent,
+              status: values.status,
+              pricePerPersonCents: cents,
+              imagePath,
+              tagIds: values.tagIds,
+              locationIds: values.locationIds,
+            }),
+          });
+
+          if (!res.ok) {
+            const message = await getErrorMessageFromResponse(
+              res,
+              `Menü konnte nicht gespeichert werden (${res.status})`,
+            );
+            toast.error(message);
+            return;
+          }
+
+          const json = (await res.json()) as {
+            id: string;
+            title?: string;
+            description?: string | null;
+            menuContent?: string;
+            pricePerPersonCents?: number | null;
+            imagePath?: string | null;
+            imageUrl?: string | null;
+            status: "active" | "archived";
+            deletedAt: string | null;
+            updatedAt: string;
+            tagIds?: string[];
+            locationIds?: string[];
+          };
+
+          patchMenu(menu.id, {
+            title: json.title ?? values.title.trim(),
+            description:
+              typeof json.description !== "undefined"
+                ? json.description
+                : values.description?.trim()
+                  ? values.description.trim()
+                  : null,
+            menuContent: json.menuContent ?? values.menuContent.trim(),
+            pricePerPersonCents:
+              typeof json.pricePerPersonCents !== "undefined"
+                ? json.pricePerPersonCents
+                : cents ?? null,
+            imagePath:
+              typeof json.imagePath !== "undefined" ? json.imagePath : imagePath,
+            imageUrl:
+              typeof json.imageUrl !== "undefined" ? json.imageUrl : imageUrl,
+            status: json.status,
+            deletedAt: json.deletedAt,
+            updatedAt: json.updatedAt,
+            tagIds: json.tagIds ?? values.tagIds,
+            locationIds: json.locationIds ?? values.locationIds,
+          });
+
+          if (originalImagePath && originalImagePath !== imagePath) {
+            void deleteMenuImageFromSupabase(originalImagePath).catch(() => {
+              // ignore
+            });
+          }
+        } catch (error: unknown) {
+          const message = normalizeNetworkErrorMessage(
+            error,
+            "Menü konnte nicht gespeichert werden",
+          );
+          toast.error(message);
+          return;
+        }
+
+        toast.success("Menü gespeichert");
+
+        setImagePath(null);
+        setImageUrl(null);
+        refresh();
+        onOpenChange(false);
+        return;
+      }
+
       try {
         const res = await fetch("/api/menus", {
           method: "POST",
@@ -362,7 +499,10 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
           return;
         }
       } catch (error: unknown) {
-        const message = normalizeNetworkErrorMessage(error, "Menü konnte nicht erstellt werden");
+        const message = normalizeNetworkErrorMessage(
+          error,
+          "Menü konnte nicht erstellt werden",
+        );
         toast.error(message);
         return;
       }
@@ -374,7 +514,15 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
       refresh();
       onOpenChange(false);
     },
-    [imagePath, menuId, onOpenChange, refresh],
+    [
+      imagePath,
+      imageUrl,
+      menu,
+      menuId,
+      onOpenChange,
+      originalImagePath,
+      refresh,
+    ],
   );
 
   return (
@@ -385,8 +533,10 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
       >
         <div className="px-6 pt-6">
           <DialogHeader>
-            <DialogTitle>Menü hinzufügen</DialogTitle>
-            <DialogDescription>Neues Menü erstellen.</DialogDescription>
+            <DialogTitle>{isEdit ? "Menü bearbeiten" : "Menü hinzufügen"}</DialogTitle>
+            <DialogDescription>
+              {isEdit ? "Menüdetails bearbeiten." : "Neues Menü erstellen."}
+            </DialogDescription>
           </DialogHeader>
         </div>
 
@@ -785,7 +935,7 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
 
           <DialogFooter className="shrink-0 border-t bg-background px-6 py-4">
             <Button type="submit" disabled={isSubmitting || imageUploading}>
-              Erstellen
+              {isEdit ? "Speichern" : "Erstellen"}
             </Button>
             <DialogClose asChild>
               <Button type="button" variant="outline">

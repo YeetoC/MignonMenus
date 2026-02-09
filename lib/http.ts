@@ -31,14 +31,14 @@ export function normalizeNetworkErrorMessage(
       message === "Load failed" ||
       message.toLowerCase().includes("networkerror")
     ) {
-      return "Network error. Check your connection and try again.";
+      return "Netzwerkfehler. Bitte Verbindung prüfen und erneut versuchen.";
     }
     return message;
   }
 
   const message = String(error);
   if (message.toLowerCase().includes("failed to fetch")) {
-    return "Network error. Check your connection and try again.";
+    return "Netzwerkfehler. Bitte Verbindung prüfen und erneut versuchen.";
   }
   return message || fallback;
 }
