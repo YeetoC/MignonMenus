@@ -20,12 +20,10 @@ import {
   Plus,
   SlidersHorizontal,
   ArrowUpDown,
-  Github,
   Check,
 } from "lucide-react";
 import { useBookmarksStore } from "@/store/bookmarks-store";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 
 interface BookmarksHeaderProps {
   title?: string;
@@ -175,16 +173,6 @@ export function BookmarksHeader({ title = "Bookmarks" }: BookmarksHeaderProps) {
           <Separator orientation="vertical" className="h-5 hidden sm:block" />
 
           <ThemeToggle />
-
-          <Button variant="ghost" size="icon" asChild>
-            <Link
-              href="https://github.com/ln-dev7/square-ui"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Github className="size-5" />
-            </Link>
-          </Button>
         </div>
       </div>
     </header>

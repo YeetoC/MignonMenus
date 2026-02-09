@@ -20,11 +20,9 @@ import {
   Plus,
   SlidersHorizontal,
   ArrowUpDown,
-  Github,
   Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 
 import { useMenusUiStore } from "@/store/menus-ui-store";
 import { AddMenuDialog } from "@/components/dashboard/add-menu-dialog";
@@ -199,18 +197,6 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
           <Separator orientation="vertical" className="h-5 hidden sm:block" />
 
           <ThemeToggle />
-
-          <Button variant="ghost" size="icon" asChild>
-            <Link
-              href="https://github.com/ln-dev7/square-ui"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Open GitHub"
-              title="GitHub"
-            >
-              <Github className="size-5" />
-            </Link>
-          </Button>
         </div>
       </div>
     </header>

@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -17,7 +16,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,7 +30,6 @@ import {
   ChevronDown,
   ChevronRight,
   Settings,
-  Globe,
   Plus,
   Check,
   User,
@@ -87,7 +84,7 @@ export function MenusSidebar({
   return (
     <Sidebar collapsible="offcanvas" className="lg:border-r-0!" {...props}>
       <SidebarHeader className="p-5 pb-0">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center">
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-2 outline-none">
               <div className="size-7 rounded-full overflow-hidden bg-linear-to-br from-blue-400 via-indigo-500 to-violet-500 flex items-center justify-center ring-1 ring-white/40 shadow-lg" />
@@ -157,10 +154,6 @@ export function MenusSidebar({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Avatar className="size-6.5">
-            <AvatarImage src="/ln.png" />
-            <AvatarFallback>LN</AvatarFallback>
-          </Avatar>
         </div>
       </SidebarHeader>
 
@@ -354,18 +347,6 @@ export function MenusSidebar({
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
-      <SidebarFooter className="px-5 pb-5">
-        <Link
-          href="https://github.com/ln-dev7/square-ui"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 h-9 px-4 rounded-md border border-border bg-background hover:bg-muted shadow-xs text-sm font-medium w-full"
-        >
-          <Globe className="size-4" />
-          square.lndev.me
-        </Link>
-      </SidebarFooter>
     </Sidebar>
   );
 }
