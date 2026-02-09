@@ -38,9 +38,9 @@ import { eurosStringToCents } from "@/lib/money";
 
 const addMenuSchema = z
   .object({
-    title: z.string().trim().min(1, "Title is required"),
+    title: z.string().trim().min(1, "Titel ist erforderlich"),
     description: z.string().trim().optional(),
-    menuContent: z.string().trim().min(1, "Menu content is required"),
+    menuContent: z.string().trim().min(1, "Menüinhalt ist erforderlich"),
     status: z.enum(["active", "archived"]).default("active"),
     tagIds: z.array(z.string()).default([]),
     locationIds: z.array(z.string()).default([]),
@@ -54,7 +54,7 @@ const addMenuSchema = z
       ctx.addIssue({
         code: "custom",
         path: ["priceEuros"],
-        message: "Invalid price",
+        message: "Ungültiger Preis",
       });
     }
   });
@@ -216,7 +216,7 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
         if (!res.ok) {
           const message = await getErrorMessageFromResponse(
             res,
-            `Failed to create tag (${res.status})`,
+            `Tag konnte nicht erstellt werden (${res.status})`,
           );
           toast.error(message);
           return null;
@@ -229,7 +229,7 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
         refresh();
         return tag;
       } catch (error: unknown) {
-        const message = normalizeNetworkErrorMessage(error, "Failed to create tag");
+        const message = normalizeNetworkErrorMessage(error, "Tag konnte nicht erstellt werden");
         toast.error(message);
         return null;
       }
@@ -254,7 +254,7 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
         setImagePath(result.path);
         setImageUrl(result.publicUrl);
       } catch (e) {
-        const message = normalizeNetworkErrorMessage(e, "Upload failed");
+        const message = normalizeNetworkErrorMessage(e, "Upload fehlgeschlagen");
         toast.error(message);
       } finally {
         setImageUploading(false);
@@ -275,7 +275,7 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
       setImagePath(null);
       setImageUrl(null);
     } catch (e) {
-      const message = normalizeNetworkErrorMessage(e, "Delete failed");
+      const message = normalizeNetworkErrorMessage(e, "Löschen fehlgeschlagen");
       toast.error(message);
     } finally {
       setImageUploading(false);
@@ -298,7 +298,7 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
         if (!res.ok) {
           const message = await getErrorMessageFromResponse(
             res,
-            `Failed to create location (${res.status})`,
+            `Standort konnte nicht erstellt werden (${res.status})`,
           );
           toast.error(message);
           return null;
@@ -313,7 +313,7 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
       } catch (error: unknown) {
         const message = normalizeNetworkErrorMessage(
           error,
-          "Failed to create location",
+          "Standort konnte nicht erstellt werden",
         );
         toast.error(message);
         return null;
@@ -331,7 +331,7 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
 
       const cents = eurosStringToCents(values.priceEuros ?? "");
       if ((values.priceEuros ?? "").trim() && cents == null) {
-        toast.error("Invalid price");
+        toast.error("Ungültiger Preis");
         return;
       }
 
@@ -356,18 +356,18 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
         if (!res.ok) {
           const message = await getErrorMessageFromResponse(
             res,
-            `Failed to create menu (${res.status})`,
+            `Menü konnte nicht erstellt werden (${res.status})`,
           );
           toast.error(message);
           return;
         }
       } catch (error: unknown) {
-        const message = normalizeNetworkErrorMessage(error, "Failed to create menu");
+        const message = normalizeNetworkErrorMessage(error, "Menü konnte nicht erstellt werden");
         toast.error(message);
         return;
       }
 
-      toast.success("Menu created");
+      toast.success("Menü erstellt");
 
       setImagePath(null);
       setImageUrl(null);
@@ -385,8 +385,8 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
       >
         <div className="px-6 pt-6">
           <DialogHeader>
-            <DialogTitle>Add Menu</DialogTitle>
-            <DialogDescription>Create a new menu.</DialogDescription>
+            <DialogTitle>Menü hinzufügen</DialogTitle>
+            <DialogDescription>Neues Menü erstellen.</DialogDescription>
           </DialogHeader>
         </div>
 
@@ -397,11 +397,11 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
           <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium" htmlFor="add-menu-title">
-                Title
+                Titel
               </label>
               <Input
                 id="add-menu-title"
-                placeholder="e.g. Lunch Specials"
+                placeholder="z.B. Mittagsangebote"
                 aria-invalid={Boolean(errors.title)}
                 {...register("title")}
               />
@@ -412,11 +412,11 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
 
             <div className="space-y-2">
               <label className="text-sm font-medium" htmlFor="add-menu-price">
-                Price (EUR) / person
+                Preis (EUR) / Person
               </label>
               <Input
                 id="add-menu-price"
-                placeholder="e.g. 12.50"
+                placeholder="z.B. 12,50"
                 inputMode="decimal"
                 aria-invalid={Boolean(errors.priceEuros)}
                 {...register("priceEuros")}
@@ -428,7 +428,7 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
 
             <div className="space-y-2">
               <label className="text-sm font-medium" htmlFor="add-menu-image">
-                Image
+                Bild
               </label>
 
               <div className="rounded-md border bg-muted/20 overflow-hidden">
@@ -436,14 +436,14 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
                   {imageUrl ? (
                     <Image
                       src={imageUrl}
-                      alt="Menu image"
+                      alt="Menübild"
                       fill
                       sizes="(max-width: 768px) 100vw, 600px"
                       className="object-cover"
                     />
                   ) : (
                     <div className="h-full w-full flex items-center justify-center text-sm text-muted-foreground">
-                      No image
+                      Kein Bild
                     </div>
                   )}
                 </div>
@@ -469,13 +469,13 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
                     disabled={isSubmitting || imageUploading}
                     onClick={() => void handleRemoveImage()}
                   >
-                    Remove
+                    Entfernen
                   </Button>
                 ) : null}
               </div>
 
               {imageUploading ? (
-                <p className="text-xs text-muted-foreground">Working…</p>
+                <p className="text-xs text-muted-foreground">Wird verarbeitet…</p>
               ) : null}
             </div>
 
@@ -484,7 +484,7 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
                 className="text-sm font-medium"
                 htmlFor="add-menu-description"
               >
-                Description
+                Beschreibung
               </label>
               <Input
                 id="add-menu-description"
@@ -504,11 +504,11 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
                 className="text-sm font-medium"
                 htmlFor="add-menu-content"
               >
-                Menu Content
+                Menüinhalt
               </label>
               <Textarea
                 id="add-menu-content"
-                placeholder="Paste the menu text here…"
+                placeholder="Menütext hier einfügen…"
                 className="min-h-32"
                 aria-invalid={Boolean(errors.menuContent)}
                 {...register("menuContent")}
@@ -527,8 +527,8 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
                   type="button"
                   variant="ghost"
                   size="icon-xs"
-                  aria-label="Add tag"
-                  title="Add tag"
+                  aria-label="Tag hinzufügen"
+                  title="Tag hinzufügen"
                   onClick={() => setTagRows((prev) => [...prev, ""])}
                 >
                   <Plus className="size-4" />
@@ -592,7 +592,7 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
                           }
                         >
                           <ComboboxInput
-                            placeholder="Select tag…"
+                            placeholder="Tag auswählen…"
                             showClear
                             aria-invalid={Boolean(errors.tagIds)}
                           />
@@ -602,13 +602,13 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
                                 <ComboboxItem
                                   value={{
                                     value: "__create__",
-                                    label: `Create \"${query.trim()}\"`,
+                                    label: `Erstellen \"${query.trim()}\"`,
                                   }}
                                 >
-                                  Create &quot;{query.trim()}&quot;
+                                  Erstellen &quot;{query.trim()}&quot;
                                 </ComboboxItem>
                               ) : null}
-                              <ComboboxEmpty>No tags found</ComboboxEmpty>
+                              <ComboboxEmpty>Keine Tags gefunden</ComboboxEmpty>
                               <ComboboxCollection>
                                 {(item) => (
                                   <ComboboxItem
@@ -633,8 +633,8 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
                           type="button"
                           variant="ghost"
                           size="icon-xs"
-                          aria-label="Remove tag"
-                          title="Remove tag"
+                          aria-label="Tag entfernen"
+                          title="Tag entfernen"
                           onClick={() =>
                             setTagRows((prev) => prev.filter((_, i) => i !== index))
                           }
@@ -650,13 +650,13 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">Locations</label>
+                <label className="text-sm font-medium">Standorte</label>
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon-xs"
-                  aria-label="Add location"
-                  title="Add location"
+                  aria-label="Standort hinzufügen"
+                  title="Standort hinzufügen"
                   onClick={() => setLocationRows((prev) => [...prev, ""])}
                 >
                   <Plus className="size-4" />
@@ -722,7 +722,7 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
                           }
                         >
                           <ComboboxInput
-                            placeholder="Select location…"
+                            placeholder="Standort auswählen…"
                             showClear
                             aria-invalid={Boolean(errors.locationIds)}
                           />
@@ -732,13 +732,13 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
                                 <ComboboxItem
                                   value={{
                                     value: "__create__",
-                                    label: `Create \"${query.trim()}\"`,
+                                    label: `Erstellen \"${query.trim()}\"`,
                                   }}
                                 >
-                                  Create &quot;{query.trim()}&quot;
+                                  Erstellen &quot;{query.trim()}&quot;
                                 </ComboboxItem>
                               ) : null}
-                              <ComboboxEmpty>No locations found</ComboboxEmpty>
+                              <ComboboxEmpty>Keine Standorte gefunden</ComboboxEmpty>
                               <ComboboxCollection>
                                 {(item) => (
                                   <ComboboxItem
@@ -763,8 +763,8 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
                           type="button"
                           variant="ghost"
                           size="icon-xs"
-                          aria-label="Remove location"
-                          title="Remove location"
+                          aria-label="Standort entfernen"
+                          title="Standort entfernen"
                           onClick={() =>
                             setLocationRows((prev) =>
                               prev.filter((_, i) => i !== index),
@@ -785,11 +785,11 @@ export function AddMenuDialog({ open, onOpenChange }: AddMenuDialogProps) {
 
           <DialogFooter className="shrink-0 border-t bg-background px-6 py-4">
             <Button type="submit" disabled={isSubmitting || imageUploading}>
-              Create
+              Erstellen
             </Button>
             <DialogClose asChild>
               <Button type="button" variant="outline">
-                Cancel
+                Abbrechen
               </Button>
             </DialogClose>
           </DialogFooter>

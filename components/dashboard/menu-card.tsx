@@ -7,12 +7,13 @@ import { toast } from "sonner";
 
 import { Copy, Heart, UtensilsCrossed } from "lucide-react";
 
-import type { Menu } from "@/lib/read-model";
+import type { Menu, Tag } from "@/lib/read-model";
 import { copyTextToClipboard } from "@/lib/clipboard";
 import { normalizeNetworkErrorMessage } from "@/lib/http";
 import { centsToEurosString } from "@/lib/money";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { setMenuIsFavorite } from "@/hooks/use-bootstrap-data";
 import { useMenusModel } from "@/hooks/use-menus-model";
 
@@ -25,16 +26,23 @@ interface MenuCardProps {
 }
 
 export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
-  const { refresh } = useMenusModel();
+  const { model, refresh } = useMenusModel();
+
+  const menuTags = React.useMemo(() => {
+    return menu.tagIds
+      .map((tagId) => model.tagById.get(tagId))
+      .filter((t): t is Tag => Boolean(t))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [menu.tagIds, model.tagById]);
 
   const [favoritePending, setFavoritePending] = React.useState(false);
 
   const handleCopyMenuContent = async () => {
     const ok = await copyTextToClipboard(menu.menuContent);
     if (ok) {
-      toast.success("Copied");
+      toast.success("Kopiert");
     } else {
-      toast.error("Copy failed");
+      toast.error("Kopieren fehlgeschlagen");
     }
   };
 
@@ -77,7 +85,7 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
       setMenuIsFavorite(menu.id, !next);
       const message = normalizeNetworkErrorMessage(
         error,
-        error instanceof Error ? error.message : "Could not toggle favorite",
+        error instanceof Error ? error.message : "Favorit konnte nicht geändert werden",
       );
       toast.error(message);
       refresh();
@@ -100,11 +108,29 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
               {menu.description}
             </p>
           ) : null}
+          {menuTags.length > 0 ? (
+            <div className="hidden sm:flex items-center gap-1 mt-1">
+              {menuTags.slice(0, 2).map((tag) => (
+                <Badge
+                  key={tag.id}
+                  variant="secondary"
+                  className="text-[10px] px-1.5 py-0.5"
+                >
+                  {tag.name}
+                </Badge>
+              ))}
+              {menuTags.length > 2 ? (
+                <span className="text-[10px] text-muted-foreground">
+                  +{menuTags.length - 2}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
         </button>
 
         {menu.pricePerPersonCents != null ? (
           <div className="hidden sm:block text-xs font-medium text-muted-foreground whitespace-nowrap">
-            €{centsToEurosString(menu.pricePerPersonCents)} / person
+            €{centsToEurosString(menu.pricePerPersonCents)} / Person
           </div>
         ) : null}
 
@@ -113,8 +139,8 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
             type="button"
             variant="ghost"
             size="icon-xs"
-            aria-label="Copy menu content"
-            title="Copy"
+            aria-label="Menüinhalt kopieren"
+            title="Kopieren"
             onClick={(e) => {
               e.stopPropagation();
               void handleCopyMenuContent();
@@ -127,8 +153,8 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
             variant="ghost"
             size="icon-xs"
             disabled={favoritePending}
-            aria-label={menu.isFavorite ? "Unfavorite" : "Favorite"}
-            title={menu.isFavorite ? "Unfavorite" : "Favorite"}
+            aria-label={menu.isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen"}
+            title={menu.isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen"}
             onClick={(e) => {
               e.stopPropagation();
               void handleToggleFavorite();
@@ -154,8 +180,8 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
           variant="secondary"
           size="icon-xs"
           className="bg-background/80 backdrop-blur-sm"
-          aria-label="Copy menu content"
-          title="Copy"
+          aria-label="Menüinhalt kopieren"
+          title="Kopieren"
           onClick={async (e) => {
             e.stopPropagation();
             await handleCopyMenuContent();
@@ -168,8 +194,8 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
           size="icon-xs"
           className="bg-background/80 backdrop-blur-sm"
           disabled={favoritePending}
-          aria-label={menu.isFavorite ? "Unfavorite" : "Favorite"}
-          title={menu.isFavorite ? "Unfavorite" : "Favorite"}
+          aria-label={menu.isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen"}
+          title={menu.isFavorite ? "Aus Favoriten entfernen" : "Zu Favoriten hinzufügen"}
           onClick={(e) => {
             e.stopPropagation();
             void handleToggleFavorite();
@@ -186,7 +212,7 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
 
       {menu.pricePerPersonCents != null ? (
         <div className="absolute bottom-3 right-3 z-10 text-xs font-medium bg-background/80 backdrop-blur-sm rounded-md px-2 py-1">
-          €{centsToEurosString(menu.pricePerPersonCents)} / person
+          €{centsToEurosString(menu.pricePerPersonCents)} / Person
         </div>
       ) : null}
 
@@ -217,6 +243,24 @@ export function MenuCard({ menu, variant = "grid", onClick }: MenuCardProps) {
             <p className="text-sm text-muted-foreground line-clamp-2">
               {menu.description}
             </p>
+          ) : null}
+          {menuTags.length > 0 ? (
+            <div className="flex flex-wrap gap-1 pt-1">
+              {menuTags.slice(0, 3).map((tag) => (
+                <Badge
+                  key={tag.id}
+                  variant="secondary"
+                  className="text-[10px] px-1.5 py-0.5"
+                >
+                  {tag.name}
+                </Badge>
+              ))}
+              {menuTags.length > 3 ? (
+                <span className="text-[10px] text-muted-foreground py-0.5">
+                  +{menuTags.length - 3} weitere
+                </span>
+              ) : null}
+            </div>
           ) : null}
         </div>
       </button>

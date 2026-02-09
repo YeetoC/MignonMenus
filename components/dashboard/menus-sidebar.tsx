@@ -46,9 +46,9 @@ import { useMenusModel } from "@/hooks/use-menus-model";
 import { useMenusUiStore } from "@/store/menus-ui-store";
 
 const navItems = [
-  { icon: Star, label: "Favorites", href: "/favorites" },
-  { icon: Archive, label: "Archive", href: "/archive" },
-  { icon: Trash2, label: "Trash", href: "/trash" },
+  { icon: Star, label: "Favoriten", href: "/favorites" },
+  { icon: Archive, label: "Archiv", href: "/archive" },
+  { icon: Trash2, label: "Papierkorb", href: "/trash" },
 ];
 
 function countForLocation(menus: { locationIds: string[]; deletedAt: string | null }[], locationId: string) {
@@ -95,7 +95,7 @@ export function MenusSidebar({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
               <DropdownMenuLabel className="text-muted-foreground text-xs font-medium">
-                Workspaces
+                Arbeitsbereiche
               </DropdownMenuLabel>
               <DropdownMenuItem>
                 <div className="size-5 rounded-full bg-linear-to-br from-blue-400 via-indigo-500 to-violet-500 mr-2" />
@@ -107,18 +107,18 @@ export function MenusSidebar({
 
               <DropdownMenuItem>
                 <Plus className="size-4 mr-2" />
-                Create Workspace
+                Arbeitsbereich erstellen
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
 
               <DropdownMenuItem>
                 <User className="size-4 mr-2" />
-                Account Settings
+                Kontoeinstellungen
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Settings className="size-4 mr-2" />
-                Workspace Settings
+                Bereichseinstellungen
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
@@ -144,13 +144,13 @@ export function MenusSidebar({
                       const message =
                         error instanceof Error
                           ? error.message
-                          : "Could not sign out";
+                          : "Abmeldung fehlgeschlagen";
                       toast.error(message);
                     });
                 }}
               >
                 <LogOut className="size-4 mr-2" />
-                Log out
+                Abmelden
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -162,8 +162,8 @@ export function MenusSidebar({
           <SidebarGroupLabel className="flex items-center gap-1.5 px-0 text-[10px] font-semibold tracking-wider text-muted-foreground">
             <button
               type="button"
-              aria-label={locationsOpen ? "Collapse locations" : "Expand locations"}
-              title={locationsOpen ? "Collapse locations" : "Expand locations"}
+              aria-label={locationsOpen ? "Standorte einklappen" : "Standorte ausklappen"}
+              title={locationsOpen ? "Standorte einklappen" : "Standorte ausklappen"}
               onClick={() => setLocationsOpen(!locationsOpen)}
               className="flex items-center gap-1.5 cursor-pointer rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
@@ -173,7 +173,7 @@ export function MenusSidebar({
                   !locationsOpen && "-rotate-90",
                 )}
               />
-              LOCATIONS
+              STANDORTE
             </button>
           </SidebarGroupLabel>
           {locationsOpen && (
@@ -193,7 +193,7 @@ export function MenusSidebar({
                       }}
                     >
                       <Folder className="size-5" />
-                      <span className="flex-1">All Menus</span>
+                      <span className="flex-1">Alle Menüs</span>
                       <span className="text-muted-foreground text-xs">
                         {menusForCounts.filter((m) => !m.deletedAt).length}
                       </span>
@@ -218,7 +218,7 @@ export function MenusSidebar({
                       }}
                     >
                       <MapPin className="size-5" />
-                      <span className="flex-1">Unassigned</span>
+                      <span className="flex-1">Nicht zugeordnet</span>
                       <span className="text-muted-foreground text-xs">
                         {countUnassigned(menusForCounts)}
                       </span>
@@ -268,8 +268,8 @@ export function MenusSidebar({
           <SidebarGroupLabel className="flex items-center gap-1.5 px-0 text-[10px] font-semibold tracking-wider text-muted-foreground">
             <button
               type="button"
-              aria-label={tagsOpen ? "Collapse tags" : "Expand tags"}
-              title={tagsOpen ? "Collapse tags" : "Expand tags"}
+              aria-label={tagsOpen ? "Tags einklappen" : "Tags ausklappen"}
+              title={tagsOpen ? "Tags einklappen" : "Tags ausklappen"}
               onClick={() => setTagsOpen(!tagsOpen)}
               className="flex items-center gap-1.5 cursor-pointer rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
@@ -284,15 +284,15 @@ export function MenusSidebar({
             {selectedTagIds.length > 0 && (
               <button
                 type="button"
-                aria-label="Clear selected tags"
-                title="Clear"
+                aria-label="Ausgewählte Tags zurücksetzen"
+                title="Zurücksetzen"
                 onClick={(e) => {
                   e.stopPropagation();
                   clearTagIds();
                 }}
                 className="ml-auto text-[10px] text-muted-foreground hover:text-foreground rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
-                Clear
+                Zurücksetzen
               </button>
             )}
           </SidebarGroupLabel>
@@ -306,8 +306,8 @@ export function MenusSidebar({
                     aria-pressed={selectedTagIds.includes(tag.id)}
                     aria-label={
                       selectedTagIds.includes(tag.id)
-                        ? `Remove tag filter ${tag.name}`
-                        : `Add tag filter ${tag.name}`
+                        ? `Tag-Filter ${tag.name} entfernen`
+                        : `Tag-Filter ${tag.name} hinzufügen`
                     }
                     onClick={() => toggleTagId(tag.id)}
                     className={cn(

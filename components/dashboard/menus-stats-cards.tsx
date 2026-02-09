@@ -8,17 +8,17 @@ import { useMenusModel } from "@/hooks/use-menus-model";
 
 const stats = [
   {
-    label: "Total Menus",
+    label: "Menüs gesamt",
     icon: UtensilsCrossed,
     color: "bg-blue-500/10 text-blue-500",
   },
   {
-    label: "Favorites",
+    label: "Favoriten",
     icon: Star,
     color: "bg-amber-500/10 text-amber-500",
   },
   {
-    label: "Locations",
+    label: "Standorte",
     icon: MapPin,
     color: "bg-violet-500/10 text-violet-500",
   },

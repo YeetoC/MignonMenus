@@ -99,13 +99,13 @@ export function ArchiveMenusContent() {
         deletedAt: json.deletedAt,
         updatedAt: json.updatedAt,
       });
-      toast.success("Restored from archive");
+      toast.success("Aus dem Archiv wiederhergestellt");
       setOpenedMenuId(null);
     } catch (error: unknown) {
       if (prevMenu) {
         patchMenu(menuId, prevMenu);
       }
-      const message = error instanceof Error ? error.message : "Could not unarchive";
+      const message = error instanceof Error ? error.message : "Wiederherstellen fehlgeschlagen";
       toast.error(message);
       refresh();
     }
@@ -124,13 +124,13 @@ export function ArchiveMenusContent() {
         deletedAt: json.deletedAt,
         updatedAt: json.updatedAt,
       });
-      toast.success("Moved to trash");
+      toast.success("In den Papierkorb verschoben");
       setOpenedMenuId(null);
     } catch (error: unknown) {
       if (prevMenu) {
         patchMenu(menuId, prevMenu);
       }
-      const message = error instanceof Error ? error.message : "Could not move to trash";
+      const message = error instanceof Error ? error.message : "Verschieben in den Papierkorb fehlgeschlagen";
       toast.error(message);
       refresh();
     }
@@ -140,7 +140,7 @@ export function ArchiveMenusContent() {
     return (
       <div className="flex-1 w-full overflow-auto">
         <div className="p-4 md:p-6 space-y-6">
-          <div className="text-sm text-muted-foreground">Loading archive…</div>
+          <div className="text-sm text-muted-foreground">Archiv wird geladen…</div>
         </div>
       </div>
     );
@@ -179,7 +179,7 @@ export function ArchiveMenusContent() {
                   onClick={() => void handleUnarchive(openedMenu.id)}
                 >
                   <RotateCcw className="size-4" />
-                  Restore
+                  Wiederherstellen
                 </Button>
                 <Button
                   type="button"
@@ -188,7 +188,7 @@ export function ArchiveMenusContent() {
                   onClick={() => void handleMoveToTrash(openedMenu.id)}
                 >
                   <Trash2 className="size-4" />
-                  Move to Trash
+                  In Papierkorb
                 </Button>
               </>
             }
@@ -200,9 +200,9 @@ export function ArchiveMenusContent() {
             <Archive className="size-5" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Archived Menus</h2>
+            <h2 className="text-lg font-semibold">Archivierte Menüs</h2>
             <p className="text-sm text-muted-foreground">
-              {filteredMenus.length} menu{filteredMenus.length !== 1 ? "s" : ""} in archive
+              {filteredMenus.length} {filteredMenus.length !== 1 ? "Menüs" : "Menü"} im Archiv
             </p>
           </div>
         </div>
@@ -236,9 +236,9 @@ export function ArchiveMenusContent() {
             <div className="size-12 rounded-full bg-muted flex items-center justify-center mb-4">
               <Archive className="size-6 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-medium mb-1">Archive is empty</h3>
+            <h3 className="text-lg font-medium mb-1">Archiv ist leer</h3>
             <p className="text-sm text-muted-foreground max-w-sm">
-              Archived menus will appear here.
+              Archivierte Menüs werden hier angezeigt.
             </p>
           </div>
         )}

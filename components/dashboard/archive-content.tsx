@@ -59,7 +59,7 @@ function ArchivedBookmarkCard({ bookmark }: { bookmark: Bookmark }) {
           onClick={() => restoreFromArchive(bookmark.id)}
         >
           <RotateCcw className="size-4 mr-1" />
-          Restore
+          Wiederherstellen
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -72,7 +72,7 @@ function ArchivedBookmarkCard({ bookmark }: { bookmark: Bookmark }) {
               onClick={() => window.open(bookmark.url, "_blank")}
             >
               <ExternalLink className="size-4 mr-2" />
-              Open URL
+              URL öffnen
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -83,7 +83,7 @@ function ArchivedBookmarkCard({ bookmark }: { bookmark: Bookmark }) {
               }}
             >
               <Trash2 className="size-4 mr-2" />
-              Move to Trash
+              In Papierkorb
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -104,10 +104,9 @@ export function ArchiveContent() {
             <Archive className="size-5" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Archived Bookmarks</h2>
+            <h2 className="text-lg font-semibold">Archivierte Lesezeichen</h2>
             <p className="text-sm text-muted-foreground">
-              {archivedBookmarks.length} bookmark
-              {archivedBookmarks.length !== 1 ? "s" : ""} in archive
+              {archivedBookmarks.length} {archivedBookmarks.length !== 1 ? "Lesezeichen" : "Lesezeichen"} im Archiv
             </p>
           </div>
         </div>
@@ -123,10 +122,10 @@ export function ArchiveContent() {
             <div className="size-12 rounded-full bg-muted flex items-center justify-center mb-4">
               <Archive className="size-6 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-medium mb-1">Archive is empty</h3>
+            <h3 className="text-lg font-medium mb-1">Archiv ist leer</h3>
             <p className="text-sm text-muted-foreground max-w-sm">
-              Archived bookmarks will appear here. Archive bookmarks you want to
-              keep but don&apos;t need right now.
+              Archivierte Lesezeichen werden hier angezeigt. Archiviere Lesezeichen,
+              die du aufbewahren, aber gerade nicht brauchst.
             </p>
           </div>
         )}

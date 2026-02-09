@@ -6,22 +6,22 @@ import { collections, tags } from "@/mock-data/bookmarks";
 
 const stats = [
   {
-    label: "Total Bookmarks",
+    label: "Lesezeichen gesamt",
     icon: Bookmark,
     color: "bg-blue-500/10 text-blue-500",
   },
   {
-    label: "Favorites",
+    label: "Favoriten",
     icon: Star,
     color: "bg-amber-500/10 text-amber-500",
   },
   {
-    label: "Collections",
+    label: "Sammlungen",
     icon: FolderOpen,
     color: "bg-violet-500/10 text-violet-500",
   },
   {
-    label: "Tags Used",
+    label: "Tags",
     icon: Tag,
     color: "bg-emerald-500/10 text-emerald-500",
   },

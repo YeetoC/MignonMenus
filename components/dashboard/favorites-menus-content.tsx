@@ -53,7 +53,7 @@ export function FavoritesMenusContent() {
     return (
       <div className="flex-1 w-full overflow-auto">
         <div className="p-4 md:p-6 space-y-6">
-          <div className="text-sm text-muted-foreground">Loading favorites…</div>
+          <div className="text-sm text-muted-foreground">Favoriten werden geladen…</div>
         </div>
       </div>
     );
@@ -91,9 +91,9 @@ export function FavoritesMenusContent() {
             <Star className="size-5" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Favorite Menus</h2>
+            <h2 className="text-lg font-semibold">Favorisierte Menüs</h2>
             <p className="text-sm text-muted-foreground">
-              {filteredMenus.length} menu{filteredMenus.length !== 1 ? "s" : ""} marked as favorite
+              {filteredMenus.length} {filteredMenus.length !== 1 ? "Menüs" : "Menü"} als Favorit markiert
             </p>
           </div>
         </div>
@@ -127,12 +127,12 @@ export function FavoritesMenusContent() {
             <div className="size-12 rounded-full bg-muted flex items-center justify-center mb-4">
               <Star className="size-6 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-medium mb-1">No favorites yet</h3>
+            <h3 className="text-lg font-medium mb-1">Noch keine Favoriten</h3>
             <p className="text-sm text-muted-foreground max-w-sm mb-4">
-              Mark menus as favorites by clicking the heart icon to see them here.
+              Markiere Menüs als Favoriten über das Herz-Symbol, um sie hier zu sehen.
             </p>
             <Button type="button" variant="outline" size="sm" onClick={() => window.history.back()}>
-              Back
+              Zurück
             </Button>
           </div>
         )}

@@ -37,12 +37,11 @@ export function BookmarksContent() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <h2 className="text-lg font-semibold">
-                {currentCollection?.name || "All Bookmarks"}
+                {currentCollection?.name || "Alle Lesezeichen"}
               </h2>
               <p className="text-sm text-muted-foreground">
-                {filteredBookmarks.length} bookmark
-                {filteredBookmarks.length !== 1 ? "s" : ""}
-                {hasActiveFilters && " (filtered)"}
+                {filteredBookmarks.length} {filteredBookmarks.length !== 1 ? "Lesezeichen" : "Lesezeichen"}
+                {hasActiveFilters && " (gefiltert)"}
               </p>
             </div>
 
@@ -50,9 +49,9 @@ export function BookmarksContent() {
               <div className="flex flex-wrap items-center gap-2">
                 {filterType !== "all" && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary">
-                    {filterType === "favorites" && "Favorites only"}
-                    {filterType === "with-tags" && "With tags"}
-                    {filterType === "without-tags" && "Without tags"}
+                    {filterType === "favorites" && "Nur Favoriten"}
+                    {filterType === "with-tags" && "Mit Tags"}
+                    {filterType === "without-tags" && "Ohne Tags"}
                     <button
                       onClick={() => setFilterType("all")}
                       className="hover:bg-primary/20 rounded-full p-0.5"
@@ -114,10 +113,9 @@ export function BookmarksContent() {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium mb-1">No bookmarks found</h3>
+              <h3 className="text-lg font-medium mb-1">Keine Lesezeichen gefunden</h3>
               <p className="text-sm text-muted-foreground max-w-sm mb-4">
-                Try adjusting your search or filter to find what you&apos;re
-                looking for, or add a new bookmark.
+                Passe deine Suche oder Filter an, um das Gewünschte zu finden.
               </p>
               {hasActiveFilters && (
                 <Button
@@ -127,7 +125,7 @@ export function BookmarksContent() {
                     setFilterType("all");
                   }}
                 >
-                  Clear filters
+                  Filter zurücksetzen
                 </Button>
               )}
             </div>

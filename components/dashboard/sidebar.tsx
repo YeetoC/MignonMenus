@@ -59,9 +59,9 @@ const collectionIcons: Record<string, React.ElementType> = {
 };
 
 const navItems = [
-  { icon: Star, label: "Favorites", href: "/favorites" },
-  { icon: Archive, label: "Archive", href: "/archive" },
-  { icon: Trash2, label: "Trash", href: "/trash" },
+  { icon: Star, label: "Favoriten", href: "/favorites" },
+  { icon: Archive, label: "Archiv", href: "/archive" },
+  { icon: Trash2, label: "Papierkorb", href: "/trash" },
 ];
 
 export function BookmarksSidebar({
@@ -89,44 +89,44 @@ export function BookmarksSidebar({
             <DropdownMenuTrigger className="flex items-center gap-2 outline-none">
               <div className="size-7 rounded-full overflow-hidden bg-linear-to-br from-blue-400 via-indigo-500 to-violet-500 flex items-center justify-center ring-1 ring-white/40 shadow-lg" />
               <span className="font-medium text-muted-foreground">
-                Square UI
+                MignonMenus
               </span>
               <ChevronDown className="size-3 text-muted-foreground" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
               <DropdownMenuLabel className="text-muted-foreground text-xs font-medium">
-                Workspaces
+                Arbeitsbereiche
               </DropdownMenuLabel>
               <DropdownMenuItem>
                 <div className="size-5 rounded-full bg-linear-to-br from-blue-400 via-indigo-500 to-violet-500 mr-2" />
-                Square UI
+                MignonMenus
                 <Check className="size-4 ml-auto" />
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <div className="size-5 rounded-full bg-linear-to-br from-emerald-400 to-cyan-500 mr-2" />
-                Personal
+                Privat
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <div className="size-5 rounded-full bg-linear-to-br from-orange-400 to-rose-500 mr-2" />
-                Work
+                Arbeit
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
 
               <DropdownMenuItem>
                 <Plus className="size-4 mr-2" />
-                Create Workspace
+                Arbeitsbereich erstellen
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
 
               <DropdownMenuItem>
                 <User className="size-4 mr-2" />
-                Account Settings
+                Kontoeinstellungen
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Settings className="size-4 mr-2" />
-                Workspace Settings
+                Bereichseinstellungen
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
@@ -152,13 +152,13 @@ export function BookmarksSidebar({
                       const message =
                         error instanceof Error
                           ? error.message
-                          : "Could not sign out";
+                          : "Abmeldung fehlgeschlagen";
                       toast.error(message);
                     });
                 }}
               >
                 <LogOut className="size-4 mr-2" />
-                Log out
+                Abmelden
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -178,7 +178,7 @@ export function BookmarksSidebar({
                   !collectionsOpen && "-rotate-90"
                 )}
               />
-              COLLECTIONS
+              SAMMLUNGEN
             </button>
           </SidebarGroupLabel>
           {collectionsOpen && (
@@ -243,7 +243,7 @@ export function BookmarksSidebar({
                 }}
                 className="ml-auto text-[10px] text-muted-foreground hover:text-foreground"
               >
-                Clear
+                Zurücksetzen
               </button>
             )}
           </SidebarGroupLabel>

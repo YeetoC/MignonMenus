@@ -17,9 +17,9 @@ export default function SignInPage() {
     <div className="flex min-h-svh w-full">
       <div className="w-full max-w-[420px] px-6 py-10 mx-auto my-auto">
         <div className="space-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Anmelden</h1>
           <p className="text-sm text-muted-foreground">
-            Use your internal account.
+            Melde dich mit deinem internen Konto an.
           </p>
         </div>
 
@@ -49,7 +49,7 @@ export default function SignInPage() {
               .catch((error: unknown) => {
                 console.error(error);
                 const message =
-                  error instanceof Error ? error.message : "Could not sign in";
+                  error instanceof Error ? error.message : "Anmeldung fehlgeschlagen";
                 toast.error(message);
                 setSubmitting(false);
               });
@@ -57,7 +57,7 @@ export default function SignInPage() {
         >
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium">
-              Email
+              E-Mail
             </label>
             <Input
               id="email"
@@ -70,7 +70,7 @@ export default function SignInPage() {
 
           <div className="space-y-2">
             <label htmlFor="password" className="text-sm font-medium">
-              Password
+              Passwort
             </label>
             <Input
               id="password"
@@ -82,7 +82,7 @@ export default function SignInPage() {
           </div>
 
           <Button type="submit" className="w-full" disabled={submitting}>
-            {submitting ? "Signing in…" : "Sign in"}
+            {submitting ? "Anmelden…" : "Anmelden"}
           </Button>
         </form>
       </div>

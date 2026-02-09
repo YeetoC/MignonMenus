@@ -16,10 +16,9 @@ export function FavoritesContent() {
             <Star className="size-5" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Favorite Bookmarks</h2>
+            <h2 className="text-lg font-semibold">Favorisierte Lesezeichen</h2>
             <p className="text-sm text-muted-foreground">
-              {favoriteBookmarks.length} bookmark
-              {favoriteBookmarks.length !== 1 ? "s" : ""} marked as favorite
+              {favoriteBookmarks.length} {favoriteBookmarks.length !== 1 ? "Lesezeichen" : "Lesezeichen"} als Favorit markiert
             </p>
           </div>
         </div>
@@ -47,10 +46,10 @@ export function FavoritesContent() {
             <div className="size-12 rounded-full bg-muted flex items-center justify-center mb-4">
               <Star className="size-6 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-medium mb-1">No favorites yet</h3>
+            <h3 className="text-lg font-medium mb-1">Noch keine Favoriten</h3>
             <p className="text-sm text-muted-foreground max-w-sm">
-              Mark bookmarks as favorites by clicking the heart icon to see them
-              here.
+              Markiere Lesezeichen als Favoriten über das Herz-Symbol, um sie hier
+              zu sehen.
             </p>
           </div>
         )}

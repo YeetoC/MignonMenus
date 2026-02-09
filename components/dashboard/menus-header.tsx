@@ -32,20 +32,20 @@ interface MenusHeaderProps {
 }
 
 const sortOptions = [
-  { value: "date-newest", label: "Updated (Newest)" },
-  { value: "date-oldest", label: "Updated (Oldest)" },
-  { value: "alpha-az", label: "Alphabetical (A-Z)" },
-  { value: "alpha-za", label: "Alphabetical (Z-A)" },
+  { value: "date-newest", label: "Aktualisiert (Neueste)" },
+  { value: "date-oldest", label: "Aktualisiert (Älteste)" },
+  { value: "alpha-az", label: "Alphabetisch (A-Z)" },
+  { value: "alpha-za", label: "Alphabetisch (Z-A)" },
 ] as const;
 
 const filterOptions = [
-  { value: "all", label: "All Menus" },
-  { value: "favorites", label: "Favorites Only" },
-  { value: "with-tags", label: "With Tags" },
-  { value: "without-tags", label: "Without Tags" },
+  { value: "all", label: "Alle Menüs" },
+  { value: "favorites", label: "Nur Favoriten" },
+  { value: "with-tags", label: "Mit Tags" },
+  { value: "without-tags", label: "Ohne Tags" },
 ] as const;
 
-export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
+export function MenusHeader({ title = "Menüs" }: MenusHeaderProps) {
   const {
     viewMode,
     setViewMode,
@@ -77,7 +77,7 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
           <div className="relative hidden md:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <Input
-              placeholder="Search…"
+              placeholder="Suchen…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 w-64 h-9"
@@ -89,8 +89,8 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
               variant="ghost"
               size="icon-xs"
               className={cn("rounded-sm", viewMode === "grid" && "bg-muted")}
-              aria-label="Grid view"
-              title="Grid view"
+              aria-label="Rasteransicht"
+              title="Rasteransicht"
               onClick={() => setViewMode("grid")}
             >
               <LayoutGrid className="size-4" />
@@ -99,8 +99,8 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
               variant="ghost"
               size="icon-xs"
               className={cn("rounded-sm", viewMode === "list" && "bg-muted")}
-              aria-label="List view"
-              title="List view"
+              aria-label="Listenansicht"
+              title="Listenansicht"
               onClick={() => setViewMode("list")}
             >
               <List className="size-4" />
@@ -113,8 +113,8 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
                 variant="outline"
                 size="sm"
                 className="hidden sm:flex"
-                aria-label="Sort menus"
-                title="Sort"
+                aria-label="Menüs sortieren"
+                title="Sortieren"
               >
                 <ArrowUpDown className="size-4" />
                 <span className="hidden lg:inline">
@@ -124,7 +124,7 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel className="text-xs text-muted-foreground">
-                Sort by
+                Sortieren nach
               </DropdownMenuLabel>
               {sortOptions.map((option) => (
                 <DropdownMenuItem
@@ -148,18 +148,19 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
                   "hidden sm:flex",
                   filterType !== "all" && "border-primary text-primary",
                 )}
-                aria-label="Filter menus"
+                aria-label="Menüs filtern"
                 title="Filter"
               >
                 <SlidersHorizontal className="size-4" />
                 <span className="hidden lg:inline">
                   {filterType !== "all" ? currentFilter?.label : "Filter"}
+
                 </span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel className="text-xs text-muted-foreground">
-                Filter by
+                Filtern nach
               </DropdownMenuLabel>
               {filterOptions.map((option) => (
                 <DropdownMenuItem
@@ -178,7 +179,7 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
                     onClick={() => setFilterType("all")}
                     className="text-muted-foreground"
                   >
-                    Clear filter
+                    Filter zurücksetzen
                   </DropdownMenuItem>
                 </>
               )}
@@ -191,7 +192,7 @@ export function MenusHeader({ title = "Menus" }: MenusHeaderProps) {
             onClick={() => setAddMenuOpen(true)}
           >
             <Plus className="size-4" />
-            Add Menu
+            Menü hinzufügen
           </Button>
 
           <Separator orientation="vertical" className="h-5 hidden sm:block" />

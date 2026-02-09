@@ -111,7 +111,7 @@ export function MenusContent() {
           <div className="text-sm text-destructive">{error}</div>
           <div>
             <Button type="button" variant="outline" size="sm" onClick={refresh}>
-              Retry
+              Erneut versuchen
             </Button>
           </div>
         </div>
@@ -141,10 +141,10 @@ export function MenusContent() {
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <h2 className="text-lg font-semibold">All Menus</h2>
+              <h2 className="text-lg font-semibold">Alle Menüs</h2>
               <p className="text-sm text-muted-foreground">
-                {filteredMenus.length} menu{filteredMenus.length !== 1 ? "s" : ""}
-                {hasActiveFilters && " (filtered)"}
+                {filteredMenus.length} {filteredMenus.length !== 1 ? "Menüs" : "Menü"}
+                {hasActiveFilters && " (gefiltert)"}
               </p>
             </div>
 
@@ -152,13 +152,13 @@ export function MenusContent() {
               <div className="flex flex-wrap items-center gap-2">
                 {filterType !== "all" && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary">
-                    {filterType === "favorites" && "Favorites only"}
-                    {filterType === "with-tags" && "With tags"}
-                    {filterType === "without-tags" && "Without tags"}
+                    {filterType === "favorites" && "Nur Favoriten"}
+                    {filterType === "with-tags" && "Mit Tags"}
+                    {filterType === "without-tags" && "Ohne Tags"}
                     <button
                       type="button"
-                      aria-label="Clear filter"
-                      title="Clear"
+                      aria-label="Filter zurücksetzen"
+                      title="Zurücksetzen"
                       onClick={() => setFilterType("all")}
                       className="hover:bg-primary/20 rounded-full p-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
@@ -174,8 +174,8 @@ export function MenusContent() {
                     {tag.name}
                     <button
                       type="button"
-                      aria-label={`Remove tag ${tag.name}`}
-                      title="Remove"
+                      aria-label={`Tag ${tag.name} entfernen`}
+                      title="Entfernen"
                       onClick={() => toggleTagId(tag.id)}
                       className="hover:bg-primary-foreground/20 rounded-full p-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
@@ -228,9 +228,9 @@ export function MenusContent() {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium mb-1">No menus found</h3>
+              <h3 className="text-lg font-medium mb-1">Keine Menüs gefunden</h3>
               <p className="text-sm text-muted-foreground max-w-sm mb-4">
-                Try adjusting your search or filter to find what you&apos;re looking for.
+                Passe deine Suche oder Filter an, um das Gewünschte zu finden.
               </p>
               {hasActiveFilters && (
                 <Button
@@ -240,7 +240,7 @@ export function MenusContent() {
                     setFilterType("all");
                   }}
                 >
-                  Clear filters
+                  Filter zurücksetzen
                 </Button>
               )}
             </div>

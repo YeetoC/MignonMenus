@@ -124,13 +124,13 @@ export function TrashMenusContent() {
         deletedAt: json.deletedAt,
         updatedAt: json.updatedAt,
       });
-      toast.success("Restored from trash");
+      toast.success("Aus dem Papierkorb wiederhergestellt");
       setOpenedMenuId(null);
     } catch (error: unknown) {
       if (prev) {
         patchMenu(menuId, prev);
       }
-      const message = error instanceof Error ? error.message : "Could not restore";
+      const message = error instanceof Error ? error.message : "Wiederherstellen fehlgeschlagen";
       toast.error(message);
       refresh();
     }
@@ -144,13 +144,13 @@ export function TrashMenusContent() {
 
     try {
       await deleteMenuApi(menuId);
-      toast.success("Deleted permanently");
+      toast.success("Endgültig gelöscht");
       setOpenedMenuId(null);
     } catch (error: unknown) {
       if (prevMenu) {
         insertMenuIntoBootstrap(prevMenu, prevIndex >= 0 ? prevIndex : 0);
       }
-      const message = error instanceof Error ? error.message : "Could not delete";
+      const message = error instanceof Error ? error.message : "Löschen fehlgeschlagen";
       toast.error(message);
       refresh();
     }
@@ -160,7 +160,7 @@ export function TrashMenusContent() {
     return (
       <div className="flex-1 w-full overflow-auto">
         <div className="p-4 md:p-6 space-y-6">
-          <div className="text-sm text-muted-foreground">Loading trash…</div>
+          <div className="text-sm text-muted-foreground">Papierkorb wird geladen…</div>
         </div>
       </div>
     );
@@ -199,7 +199,7 @@ export function TrashMenusContent() {
                   onClick={() => void handleRestore(openedMenu.id)}
                 >
                   <RotateCcw className="size-4" />
-                  Restore
+                  Wiederherstellen
                 </Button>
                 <Button
                   type="button"
@@ -208,7 +208,7 @@ export function TrashMenusContent() {
                   onClick={() => void handleDeletePermanently(openedMenu.id)}
                 >
                   <XCircle className="size-4" />
-                  Delete Permanently
+                  Endgültig löschen
                 </Button>
               </>
             }
@@ -221,15 +221,15 @@ export function TrashMenusContent() {
               <Trash2 className="size-5" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold">Trash</h2>
+              <h2 className="text-lg font-semibold">Papierkorb</h2>
               <p className="text-sm text-muted-foreground">
-                {filteredMenus.length} menu{filteredMenus.length !== 1 ? "s" : ""} in trash
+                {filteredMenus.length} {filteredMenus.length !== 1 ? "Menüs" : "Menü"} im Papierkorb
               </p>
             </div>
           </div>
           {filteredMenus.length > 0 && (
             <p className="text-xs text-muted-foreground hidden sm:block">
-              Items in trash will be permanently deleted after 30 days
+              Einträge im Papierkorb werden nach 30 Tagen endgültig gelöscht
             </p>
           )}
         </div>
@@ -263,9 +263,9 @@ export function TrashMenusContent() {
             <div className="size-12 rounded-full bg-muted flex items-center justify-center mb-4">
               <Trash2 className="size-6 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-medium mb-1">Trash is empty</h3>
+            <h3 className="text-lg font-medium mb-1">Papierkorb ist leer</h3>
             <p className="text-sm text-muted-foreground max-w-sm">
-              Deleted menus will appear here. You can restore them or delete them permanently.
+              Gelöschte Menüs werden hier angezeigt. Du kannst sie wiederherstellen oder endgültig löschen.
             </p>
           </div>
         )}

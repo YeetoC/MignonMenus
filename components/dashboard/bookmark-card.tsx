@@ -111,27 +111,27 @@ export function BookmarkCard({
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={handleCopyUrl}>
                 <Copy className="size-4 mr-2" />
-                Copy URL
+                URL kopieren
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Pencil className="size-4 mr-2" />
-                Edit
+                Bearbeiten
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Tag className="size-4 mr-2" />
-                Add Tags
+                Tags hinzufügen
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => archiveBookmark(bookmark.id)}>
                 <Archive className="size-4 mr-2" />
-                Archive
+                Archivieren
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-destructive"
                 onClick={() => trashBookmark(bookmark.id)}
               >
                 <Trash2 className="size-4 mr-2" />
-                Delete
+                Löschen
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -169,31 +169,31 @@ export function BookmarkCard({
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={handleCopyUrl}>
               <Copy className="size-4 mr-2" />
-              Copy URL
+              URL kopieren
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleOpenUrl}>
               <ExternalLink className="size-4 mr-2" />
-              Open in new tab
+              In neuem Tab öffnen
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Pencil className="size-4 mr-2" />
-              Edit
+              Bearbeiten
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Tag className="size-4 mr-2" />
-              Add Tags
+              Tags hinzufügen
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => archiveBookmark(bookmark.id)}>
               <Archive className="size-4 mr-2" />
-              Archive
+              Archivieren
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-destructive"
               onClick={() => trashBookmark(bookmark.id)}
             >
               <Trash2 className="size-4 mr-2" />
-              Delete
+              Löschen
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -237,7 +237,7 @@ export function BookmarkCard({
               ))}
               {bookmarkTags.length > 3 && (
                 <span className="text-[10px] text-muted-foreground py-0.5">
-                  +{bookmarkTags.length - 3} more
+                  +{bookmarkTags.length - 3} weitere
                 </span>
               )}
             </div>

@@ -41,7 +41,7 @@ function TrashedBookmarkCard({ bookmark }: { bookmark: Bookmark }) {
           onClick={() => restoreFromTrash(bookmark.id)}
         >
           <RotateCcw className="size-4 mr-1" />
-          Restore
+          Wiederherstellen
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -54,7 +54,7 @@ function TrashedBookmarkCard({ bookmark }: { bookmark: Bookmark }) {
               onClick={() => window.open(bookmark.url, "_blank")}
             >
               <ExternalLink className="size-4 mr-2" />
-              Open URL
+              URL öffnen
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -62,7 +62,7 @@ function TrashedBookmarkCard({ bookmark }: { bookmark: Bookmark }) {
               onClick={() => permanentlyDelete(bookmark.id)}
             >
               <XCircle className="size-4 mr-2" />
-              Delete Permanently
+              Endgültig löschen
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -84,16 +84,15 @@ export function TrashContent() {
               <Trash2 className="size-5" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold">Trash</h2>
+              <h2 className="text-lg font-semibold">Papierkorb</h2>
               <p className="text-sm text-muted-foreground">
-                {trashedBookmarks.length} bookmark
-                {trashedBookmarks.length !== 1 ? "s" : ""} in trash
+                {trashedBookmarks.length} {trashedBookmarks.length !== 1 ? "Lesezeichen" : "Lesezeichen"} im Papierkorb
               </p>
             </div>
           </div>
           {trashedBookmarks.length > 0 && (
             <p className="text-xs text-muted-foreground hidden sm:block">
-              Items in trash will be permanently deleted after 30 days
+              Einträge im Papierkorb werden nach 30 Tagen endgültig gelöscht
             </p>
           )}
         </div>
@@ -109,10 +108,10 @@ export function TrashContent() {
             <div className="size-12 rounded-full bg-muted flex items-center justify-center mb-4">
               <Trash2 className="size-6 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-medium mb-1">Trash is empty</h3>
+            <h3 className="text-lg font-medium mb-1">Papierkorb ist leer</h3>
             <p className="text-sm text-muted-foreground max-w-sm">
-              Deleted bookmarks will appear here. You can restore them or delete
-              them permanently.
+              Gelöschte Lesezeichen werden hier angezeigt. Du kannst sie wiederherstellen
+              oder endgültig löschen.
             </p>
           </div>
         )}

@@ -39,9 +39,9 @@ export function MenuDialogStickyFooter({
   const handleCopy = async () => {
     const ok = await copyTextToClipboard(menu.menuContent);
     if (ok) {
-      toast.success("Copied");
+      toast.success("Kopiert");
     } else {
-      toast.error("Copy failed");
+      toast.error("Kopieren fehlgeschlagen");
     }
   };
 
@@ -98,11 +98,11 @@ export function MenuDialogStickyFooter({
         <DialogFooter className="shrink-0 border-t bg-background px-6 py-4">
           {footerActions}
           <Button type="button" onClick={() => void handleCopy()}>
-            Copy
+            Kopieren
           </Button>
           <DialogClose asChild>
             <Button type="button" variant="outline">
-              Close
+              Schließen
             </Button>
           </DialogClose>
         </DialogFooter>
