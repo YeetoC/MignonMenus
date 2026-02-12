@@ -97,7 +97,7 @@ export function MenuDialogStickyFooter({
 
           {menu.menuContentHtml ? (
             <div
-              className="text-sm leading-relaxed [&_p]:mb-2 [&_p:last-child]:mb-0 [&_div]:mb-2 [&_div:last-child]:mb-0 [&_ul]:list-disc [&_ol]:list-decimal [&_ul,&_ol]:pl-6 [&_li]:my-1 [&_table]:my-2 [&_table]:w-full [&_table]:border-collapse [&_td]:align-top [&_th]:align-top [&_td]:border [&_th]:border [&_td]:border-border [&_th]:border-border [&_td]:p-2 [&_th]:p-2"
+              className="text-[13pt] leading-relaxed [&_p]:mb-2 [&_p:last-child]:mb-0 [&_div]:mb-2 [&_div:last-child]:mb-0 [&_ul]:list-disc [&_ol]:list-decimal [&_ul,&_ol]:pl-6 [&_li]:my-1 [&_table]:my-2 [&_table]:w-full [&_table]:border-collapse [&_td]:align-top [&_th]:align-top [&_td]:border [&_th]:border [&_td]:border-border [&_th]:border-border [&_td]:p-2 [&_th]:p-2"
               dangerouslySetInnerHTML={{ __html: menu.menuContentHtml }}
             />
           ) : (

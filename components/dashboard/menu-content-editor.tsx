@@ -17,8 +17,24 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html";
 import { ListItemNode, ListNode } from "@lexical/list";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
-import type { EditorState, LexicalEditor } from "lexical";
-import { $createParagraphNode, $createTextNode, $getRoot } from "lexical";
+import type {
+  DOMConversion,
+  DOMConversionMap,
+  DOMConversionOutput,
+  EditorState,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
+  SerializedTextNode,
+} from "lexical";
+import {
+  $applyNodeReplacement,
+  $createParagraphNode,
+  $createTextNode,
+  $getRoot,
+  $isTextNode,
+  TextNode,
+} from "lexical";
 
 export type MenuContentEditorProps = {
   id?: string;
@@ -31,6 +47,122 @@ export type MenuContentEditorProps = {
   onBlur?: () => void;
   onChange: (next: { plainText: string; html: string }) => void;
 };
+
+function patchStyleConversion(
+  originalDOMConverter?: (node: HTMLElement) => DOMConversion | null,
+): (node: HTMLElement) => DOMConversionOutput | null {
+  return (node) => {
+    const original = originalDOMConverter?.(node);
+    if (!original) {
+      return null;
+    }
+
+    const originalOutput = original.conversion(node);
+    if (!originalOutput) {
+      return originalOutput;
+    }
+
+    const backgroundColor = node.style.backgroundColor;
+    const color = node.style.color;
+    const fontFamily = node.style.fontFamily;
+    const fontSize = node.style.fontSize;
+    const fontStyle = node.style.fontStyle;
+    const fontWeight = node.style.fontWeight;
+    const lineHeight = node.style.lineHeight;
+    const textDecoration = node.style.textDecoration;
+
+    return {
+      ...originalOutput,
+      forChild: (lexicalNode, parent) => {
+        const originalForChild = originalOutput.forChild ?? ((x) => x);
+        const result = originalForChild(lexicalNode, parent);
+
+        if ($isTextNode(result)) {
+          const style = [
+            backgroundColor ? `background-color: ${backgroundColor}` : null,
+            color ? `color: ${color}` : null,
+            fontFamily ? `font-family: ${fontFamily}` : null,
+            fontSize ? `font-size: ${fontSize}` : null,
+            fontStyle ? `font-style: ${fontStyle}` : null,
+            fontWeight ? `font-weight: ${fontWeight}` : null,
+            lineHeight ? `line-height: ${lineHeight}` : null,
+            textDecoration ? `text-decoration: ${textDecoration}` : null,
+          ]
+            .filter((value) => value != null)
+            .join("; ");
+
+          if (style.length) {
+            const prev = result.getStyle();
+            return result.setStyle(prev ? `${prev}; ${style}` : style);
+          }
+        }
+
+        return result;
+      },
+    };
+  };
+}
+
+class ExtendedTextNode extends TextNode {
+  static getType(): string {
+    return "extended-text";
+  }
+
+  static clone(node: ExtendedTextNode): ExtendedTextNode {
+    return new ExtendedTextNode(node.__text, node.__key);
+  }
+
+  static importDOM(): DOMConversionMap | null {
+    const importers = TextNode.importDOM();
+
+    return {
+      ...importers,
+      code: () => ({
+        conversion: patchStyleConversion(importers?.code),
+        priority: 1,
+      }),
+      em: () => ({
+        conversion: patchStyleConversion(importers?.em),
+        priority: 1,
+      }),
+      span: () => ({
+        conversion: patchStyleConversion(importers?.span),
+        priority: 1,
+      }),
+      strong: () => ({
+        conversion: patchStyleConversion(importers?.strong),
+        priority: 1,
+      }),
+      sub: () => ({
+        conversion: patchStyleConversion(importers?.sub),
+        priority: 1,
+      }),
+      sup: () => ({
+        conversion: patchStyleConversion(importers?.sup),
+        priority: 1,
+      }),
+    };
+  }
+
+  static importJSON(serializedNode: SerializedTextNode): TextNode {
+    const node = $createExtendedTextNode(serializedNode.text);
+    node.setFormat(serializedNode.format);
+    node.setDetail(serializedNode.detail);
+    node.setMode(serializedNode.mode);
+    node.setStyle(serializedNode.style);
+    return node;
+  }
+}
+
+function $createExtendedTextNode(text = ""): ExtendedTextNode {
+  return $applyNodeReplacement(new ExtendedTextNode(text));
+}
+
+function $isExtendedTextNode(
+  node: LexicalNode | null | undefined,
+): node is ExtendedTextNode {
+  return node instanceof ExtendedTextNode;
+}
 
 function InitialContentPlugin({
   initialPlainText,
@@ -107,7 +239,26 @@ export function MenuContentEditor({
   const initialConfig = React.useMemo(
     () => ({
       namespace: "MenuContentEditor",
-      nodes: [ListNode, ListItemNode, TableNode, TableRowNode, TableCellNode],
+      nodes: [
+        ExtendedTextNode,
+        {
+          replace: TextNode,
+          with: (node: TextNode) => {
+            const next = new ExtendedTextNode(node.getTextContent());
+            next.setFormat(node.getFormat());
+            next.setDetail(node.getDetail());
+            next.setMode(node.getMode());
+            next.setStyle(node.getStyle());
+            return next;
+          },
+          withKlass: ExtendedTextNode,
+        },
+        ListNode,
+        ListItemNode,
+        TableNode,
+        TableRowNode,
+        TableCellNode,
+      ],
       onError(error: unknown) {
         throw error;
       },
@@ -129,7 +280,7 @@ export function MenuContentEditor({
           "border-input dark:bg-input/30",
           "focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50",
           "aria-invalid:ring-destructive/20 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40",
-          "text-base md:text-sm",
+          "text-[13pt]",
           "[&_p]:mb-2 [&_p:last-child]:mb-0",
           "[&_ul]:list-disc [&_ol]:list-decimal [&_ul,&_ol]:pl-6 [&_li]:my-1",
           "[&_table]:my-2 [&_table]:w-full [&_table]:border-collapse",
@@ -144,6 +295,7 @@ export function MenuContentEditor({
           contentEditable={
             <ContentEditable
               id={id}
+              spellCheck={false}
               className={cn(
                 "min-h-32 outline-none",
                 "placeholder:text-muted-foreground",

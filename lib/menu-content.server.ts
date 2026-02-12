@@ -63,6 +63,18 @@ export function sanitizeMenuContentHtml(input: string): string {
         "text-decoration": [/^(none|underline|line-through)$/],
         "font-size": [/^\d+(\.\d+)?(px|pt)$/],
         "text-align": [/^(left|right|center|justify)$/],
+        color: [
+          /^#[0-9a-fA-F]{3,8}$/,
+          /^rgb\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*\)$/,
+          /^rgba\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*(0|1|0?\.\d+)\s*\)$/,
+        ],
+        "background-color": [
+          /^#[0-9a-fA-F]{3,8}$/,
+          /^rgb\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*\)$/,
+          /^rgba\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*(0|1|0?\.\d+)\s*\)$/,
+        ],
+        "font-family": [/^[a-zA-Z0-9\s",\-']+$/],
+        "line-height": [/^(normal|\d+(\.\d+)?(px|pt|em|rem|%)?)$/],
       },
     },
     disallowedTagsMode: "discard",
